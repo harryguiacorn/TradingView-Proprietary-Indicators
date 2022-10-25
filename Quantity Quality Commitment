@@ -1,0 +1,101 @@
+//@version=4
+study('Quantity Quality Commitment', shorttitle = "QQC", overlay=false)
+
+//Philosophy: one of the most basic forms of looking at battelfield result is to look at close vs open price,
+//if it's a bullish candle, no matter how small the victory is, a victory in that time slot allowed nevertheless.
+//This indicator counts the number of bullish candles vs bearish ones over the default period of past 9 bars.
+lenLookBack = input(title="Look Back Period", type=input.integer, defval=9, minval=1)
+bDisplayPowerLabels = input(title="Display Power Labels", type=input.bool, defval=false)
+bDisplayEnergyLabels = input(title="Display Energy Labels", type=input.bool, defval=false)
+bDisplayVolumeLabels = input(title="Display Volume Labels", type=input.bool, defval=false)
+bDisplayCandles = input(title="Display Candles", type=input.bool, defval=false)
+bDisplayArrows = input(title="Display Old Arrows", type=input.bool, defval=false)
+iSizeCircles = input(title="Circle size", type=input.integer, defval=6)
+//bDisplayPowerArrows = input(title="Display Power Arrows", type=input.bool, defval=true)
+indexCountStartPowerShift = 0
+count_green = 0
+count_red = 0
+for x = indexCountStartPowerShift to lenLookBack - 1
+    isGreen = close[x] > open[x]
+    isRed = close[x] < open[x]
+    if isGreen
+        count_green := count_green + 1
+    if isRed
+        count_red := count_red + 1
+series_green_powershift    = count_green > count_red
+series_red_powershift      = count_green < count_red
+//plotshape(bDisplayArrows ? series_green_powershift  : na, style=shape.arrowup,     transp=0, location=bDisplayCandles ? location.belowbar : location.top, color=color.orange, size = size.small)//#f57f17
+//plotshape(bDisplayArrows ? series_red_powershift    : na, style=shape.arrowdown,   transp=0, location=bDisplayCandles ? location.belowbar : location.top, color=color.purple, size = size.small)
+if count_green > count_red and bDisplayPowerLabels
+    label.new(bar_index[indexCountStartPowerShift], low, tostring(count_green), style=label.style_labelup, yloc=yloc.belowbar, color=color.lime)
+if count_green < count_red and bDisplayPowerLabels
+    label.new(bar_index[indexCountStartPowerShift], low, tostring(count_red), style=label.style_labeldown, yloc=yloc.abovebar, color=color.red)
+
+//@version=4
+//Philosophy: rank the assertiveness based on the candle body vs whole candle range ratio, 
+//so a doji would have a ranking of 0 since open and close are the same, a Marubozu would get 100%.
+
+//study('Energy Shift', overlay=true)
+indexCountStartEnergyShift = 0
+
+float sumBodyPercentage = 0, float sumBodyVolumePercentage = 0
+float rangeCandleBody = 0
+float bodyPercentage = 0, float bodyVolumePercentage = 0
+float rangeCandleWhole = 0
+
+for x = indexCountStartEnergyShift to lenLookBack - 1
+    rangeCandleBody         := close[x]  - open[x]
+    rangeCandleWhole        := high[x]   - low[x]
+    bodyPercentage          := nz(rangeCandleBody / rangeCandleWhole * 100 * (high[x] - low[x]))
+    sumBodyPercentage       := sumBodyPercentage + bodyPercentage
+    bodyVolumePercentage    := nz(rangeCandleBody / rangeCandleWhole * volume[x])
+    sumBodyVolumePercentage := sumBodyVolumePercentage + bodyVolumePercentage
+series_green_energyshift    = sumBodyPercentage > 0
+series_red_energyshift      = sumBodyPercentage < 0
+series_green_volumeshift    = sumBodyVolumePercentage > 0
+series_red_volumeshift      = sumBodyVolumePercentage < 0
+//plotshape(bDisplayArrows ? series_green_energyshift : na, style=shape.labelup,        transp=0, location=bDisplayCandles ? location.belowbar : location.top, color=color.orange, size = size.normal)//#f57f17
+//plotshape(bDisplayArrows ? series_red_energyshift : na,   style=shape.labeldown,      transp=0, location=bDisplayCandles ? location.belowbar : location.bottom, color=color.purple, size = size.normal)
+//plotshape(bDisplayArrows ? series_green_volumeshift : na, style=shape.triangleup,     transp=0, location=location.bottom, color=color.orange, size = size.small)//#f57f17
+//plotshape(bDisplayArrows ? series_red_volumeshift : na,   style=shape.triangledown,   transp=0, location=location.bottom, color=color.purple, size = size.small)
+if(sumBodyPercentage > 0 and bDisplayEnergyLabels)
+    label.new(bar_index[indexCountStartEnergyShift], low,  tostring(sumBodyPercentage), style=label.style_labelup,     yloc=yloc.belowbar, color=color.orange)
+if(sumBodyPercentage < 0 and bDisplayEnergyLabels)
+    label.new(bar_index[indexCountStartEnergyShift], high, tostring(sumBodyPercentage), style=label.style_labeldown,   yloc=yloc.abovebar, color=color.silver)
+if(sumBodyVolumePercentage > 0 and bDisplayVolumeLabels)
+    label.new(bar_index[indexCountStartEnergyShift], low,  tostring(sumBodyVolumePercentage), style=label.style_labelup,     yloc=yloc.belowbar, color=color.orange)
+if(sumBodyVolumePercentage < 0 and bDisplayVolumeLabels)
+    label.new(bar_index[indexCountStartEnergyShift], high, tostring(sumBodyVolumePercentage), style=label.style_labeldown,   yloc=yloc.abovebar, color=color.silver)
+//plotcandle(bDisplayCandles ? open : na, bDisplayCandles ? high : na, bDisplayCandles ? low : na,bDisplayCandles ? close : na, color = open < close ? color.white : color.black, wickcolor=color.black)
+
+//3M - new version
+p1 = plot(series_green_powershift   ? 3     : na, color=color.orange, linewidth = iSizeCircles, style = plot.style_circles, title = "Quantity+")
+p2 = plot(series_red_powershift     ? 3     : na, color=color.purple, linewidth = iSizeCircles, style = plot.style_circles, title = "Quantity-")
+p3 = plot(series_green_energyshift  ? -7   : na, color=color.orange, linewidth = iSizeCircles, style = plot.style_circles, title = "Quality+")
+p4 = plot(series_red_energyshift    ? -7   : na, color=color.purple, linewidth = iSizeCircles, style = plot.style_circles, title = "Qiality-")
+p5 = plot(series_green_volumeshift  ? -17   : na, color=color.orange, linewidth = iSizeCircles, style = plot.style_circles, title = "Volume+")
+p6 = plot(series_red_volumeshift    ? -17   : na, color=color.purple, linewidth = iSizeCircles, style = plot.style_circles, title = "Volume-")
+//p7 = plot(sumBodyPercentage, color=color.purple, linewidth = iSizeCircles, style = plot.style_circles, title = "testing body percentage")
+
+//---------------COPY OF ADX-------------
+//study("ADX", shorttitle="ADX", format=format.price, precision=2, resolution="")
+adxlen = input(14, title="ADX Smoothing")
+dilen = input(14, title="DI Length")
+dirmov(len) =>
+	up = change(high)
+	down = -change(low)
+	plusDM = na(up) ? na : (up > down and up > 0 ? up : 0)
+	minusDM = na(down) ? na : (down > up and down > 0 ? down : 0)
+	truerange = rma(tr, len)
+	plus = fixnan(100 * rma(plusDM, len) / truerange)
+	minus = fixnan(100 * rma(minusDM, len) / truerange)
+	[plus, minus]
+adx(dilen, adxlen) =>
+	[plus, minus] = dirmov(dilen)
+	sum = plus + minus
+	adx = 100 * rma(abs(plus - minus) / (sum == 0 ? 1 : sum), adxlen)
+sig = adx(dilen, adxlen)
+_histbase = input(title="Base of Line in the sand", type=input.integer, defval=10)
+plot(sig, color=sig>=20 ? color.black:color.silver, title="ADX", linewidth = 2, style = plot.style_columns, histbase = _histbase)
+//_hLine = hline(20, title="Line in the sand", color=color.purple, linestyle=hline.style_solid, linewidth=2)
+//---------------COPY OF ADX-------------
