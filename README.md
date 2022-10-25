@@ -1,0 +1,2 @@
+# tradingview
+Pine script
