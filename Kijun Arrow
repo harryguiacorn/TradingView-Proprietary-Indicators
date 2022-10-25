@@ -1,0 +1,63 @@
+//@version=4
+study('Kijun Arrow', overlay=true)
+conversionPeriods = input(9, minval=1, title="Conversion Line Periods"),
+basePeriodsK = input(26, minval=1, title="Base Line Periods")
+getMidPoint(_len, __offset) => MidPointOffset = avg(lowest(_len)[__offset], highest(_len)[__offset])
+Kijun = getMidPoint(basePeriodsK, 0)
+//MODIFIED FROM OFFICIAL ICHIMOKU PINE SCRIPT
+laggingSpan2Periods = input(52, minval=1, title="Lagging Span 2 Periods"),
+displacement = input(26, minval=1, title="Displacement")
+donchian(len) => avg(lowest(len), highest(len))
+conversionLine = donchian(conversionPeriods)
+baseLine = donchian(basePeriodsK)
+leadLine1 = avg(conversionLine, baseLine)
+leadLine2 = donchian(laggingSpan2Periods)
+plot(conversionLine,    color=color.fuchsia,  linewidth = 2, transp = 0, title="Conversion Line")
+plot(baseLine,          color=color.blue,     linewidth = 4, transp = 0, title="Base Line")
+plot(close, offset = -displacement, color=color.black, title="Lagging Span", style = plot.style_circles, transp = 0, linewidth = 3) 
+p1 = plot(leadLine1, offset = displacement, color=color.green, title="Lead 1")
+p2 = plot(leadLine2, offset = displacement, color=color.red, title="Lead 2")
+fill(p1, p2, color = leadLine1 > leadLine2 ? color.green : color.red)
+//END OF OFFICIAL ICHIMOKU PINE SCRIPT
+_curArrowDirection = if (Kijun[0] - Kijun[1] > 0)
+    1
+else if (Kijun[0] - Kijun[1] < 0)
+    -1
+var _existingArrowDirection = 0
+_direction = 0
+if (_curArrowDirection != _existingArrowDirection)
+    _direction := _curArrowDirection
+    _existingArrowDirection := _curArrowDirection
+plotarrow(_direction, title = "Kijun Arrow", colorup=color.black, colordown=color.black, transp=0, minheight = 15, maxheight = 15)
+
+//---------------COPY OF HOLP--------------//Commented out as new Pinescript threw errors in them.
+// lenLookBackHOLPLOHP = input(title="HOLP/LOHP Look Back Period", defval=10, minval=2, type=input.integer)
+// bDisplayHOLP = input(title="Display HOLP/LOHP", type=input.bool, defval=true)
+// var _boolNewLow = 0
+// _sessionLow = 0.0
+// lastLoBar = - lowestbars(lenLookBackHOLPLOHP + 1)
+// if (low[0] < lowest(lenLookBackHOLPLOHP)[1])
+//     _sessionLow := low[0]
+//     _boolNewLow := 1
+// _arrowHOLP = 0.0
+// _indexLastLoBar = (round(lastLoBar))
+// if (close[0] > high[lastLoBar]) and (low[lastLoBar] >=  lowest(lenLookBackHOLPLOHP + _indexLastLoBar)) //( (lowest(lenLookBackHOLPLOHP)[1] < low[lenLookBackHOLPLOHP])
+//     if (_boolNewLow == 1)
+//         _arrowHOLP  := close[0]
+//         _boolNewLow := 0
+// plotshape(bDisplayHOLP?_arrowHOLP:na, title = "HOLP Circle", style=shape.circle, location=location.belowbar, offset=0, color=color.maroon, transp=0, size = size.small)
+
+// var _boolNewHigh = 0
+// _sessionHigh = 0.0
+// lastHiBar = - highestbars(lenLookBackHOLPLOHP + 1)
+// if (high[0] > highest(lenLookBackHOLPLOHP)[1])
+//     _sessionHigh := high[0]
+//     _boolNewHigh := 1
+// _arrowLOHP = 0.0
+// _indexLastHiBar = (round(lastHiBar))
+// if (close[0] < low[lastHiBar]) and (high[lastHiBar] >=  highest(lenLookBackHOLPLOHP + _indexLastHiBar)) //(highest(lenLookBackHOLPLOHP)[1] > high[lenLookBackHOLPLOHP])
+//     if (_boolNewHigh == 1)
+//         _arrowLOHP  := close[0]
+//         _boolNewHigh := 0
+// plotshape(bDisplayHOLP?_arrowLOHP:na, title = "LOHP Circle", style=shape.circle, location=location.abovebar, offset=0, color=color.maroon, transp=0, size = size.small)
+//---------------COPY OF HOLP--------------
