@@ -1,7 +1,7 @@
 //@version=5
 //Buy and sell depending on K arrow, no pyramiding, keep it simple.
 _maxPyramiding = 0
-strategy('STRG-Kijun_1', overlay=true, initial_capital = 10000, pyramiding=_maxPyramiding, default_qty_value = 0)
+strategy('STRG-Kijun', overlay=true, initial_capital = 10000, pyramiding=_maxPyramiding, default_qty_value = 0)
 _year = input.int(2018, minval=1, title='Look back since(yr)')
 contract = input.int(0, minval=0, title='Contract size')
 //BEGINING OF COPY KIJUN ARROW
@@ -22,10 +22,10 @@ leadLine1 = math.avg(conversionLine, baseLine)
 leadLine2 = donchian(laggingSpan2Periods)
 // plot(conversionLine,    color=color.new(color.fuchsia, 0),  linewidth = 2, title="Conversion Line")
 plot(baseLine, color=color.new(color.blue, transp=0), linewidth=4, title='Base Line')
-plot(close, offset=-displacement, color=color.new(color.black, transp=0), title='Lagging Span', style=plot.style_circles, linewidth=3)
-p1 = plot(leadLine1, offset=displacement, color=color.new(color.green, 0), title='Lead 1')
-p2 = plot(leadLine2, offset=displacement, color=color.new(color.red, 0), title='Lead 2')
-fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
+// plot(close, offset=-displacement, color=color.new(color.black, transp=0), title='Lagging Span', style=plot.style_circles, linewidth=3)
+// p1 = plot(leadLine1, offset=displacement, color=color.new(color.green, 0), title='Lead 1')
+// p2 = plot(leadLine2, offset=displacement, color=color.new(color.red, 0), title='Lead 2')
+// fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
 //END OF OFFICIAL ICHIMOKU PINE SCRIPT
 _curArrowDirection = if Kijun[0] - Kijun[1] > 0
     1
@@ -60,10 +60,10 @@ _contract = contract == 0 ? strategy.initial_capital / close: contract //get con
 if(longCondition)
     strategy.close('S', comment = 'Close S')
     strategy.entry('L', strategy.long, _contract)
-    strategy.exit("Exit L", "L", stop = close - __stopLossDis, limit = close + __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
+    // strategy.exit("Exit L", "L", stop = close - __stopLossDis, limit = close + __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
 if (shortCondition)
     strategy.close('L', comment = 'Close L')
     strategy.entry('S', strategy.short, _contract)
-    strategy.exit("Exit S", "S", stop = close + __stopLossDis, limit = close - __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
+    // strategy.exit("Exit S", "S", stop = close + __stopLossDis, limit = close - __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
 // if (strategy.position_size > 0)
 
