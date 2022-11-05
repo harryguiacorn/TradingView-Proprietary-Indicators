@@ -1,8 +1,8 @@
 //@version=4
 _maxPyramiding = 0
-strategy("STRG-Kijun", overlay=true, pyramiding = _maxPyramiding)
+strategy("STRG-Kijun", overlay=true, initial_capital = 10000, pyramiding = _maxPyramiding)
 _year = input(2020, minval=1, title="Look back since(yr)")
-_contract = input(1, minval=1, title="Contract size")
+contract = input(1, minval=0, title="Contract size")
 //BEGINING OF COPY KIJUN ARROW
 conversionPeriods = input(9, minval=1, title="Conversion Line Periods"),
 basePeriodsK = input(26, minval=1, title="Base Line Periods")
@@ -39,7 +39,7 @@ KijunOffset = getMidPoint(basePeriodsK, 1)
 _atrNumStop = 2
 _atrNumProfit = 4
 _atr = atr(14)
-
+_contract = contract == 0 ? strategy.initial_capital / close: contract //get contract no. based on initial capital is left to 0
 longCondition = (Kijun > KijunOffset) and (year >= _year) // and (strategy.position_size <= _maxPyramiding)
 exitCondition = (_existingArrowDirection == 1) and (year >= _year)
 if (longCondition)
