@@ -20,12 +20,12 @@ conversionLine = donchian(conversionPeriods)
 baseLine = donchian(basePeriodsK)
 leadLine1 = math.avg(conversionLine, baseLine)
 leadLine2 = donchian(laggingSpan2Periods)
-// plot(conversionLine,    color=color.new(color.fuchsia, 0),  linewidth = 2, title="Conversion Line")
-plot(baseLine, color=color.new(color.blue, transp=0), linewidth=4, title='Base Line')
-// plot(close, offset=-displacement, color=color.new(color.black, transp=0), title='Lagging Span', style=plot.style_circles, linewidth=3)
-// p1 = plot(leadLine1, offset=displacement, color=color.new(color.green, 0), title='Lead 1')
-// p2 = plot(leadLine2, offset=displacement, color=color.new(color.red, 0), title='Lead 2')
-// fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
+plot(conversionLine,    color=color.new(color.fuchsia, 0),  linewidth = 2, title="Conversion Line", display = display.none)
+plot(baseLine, color=color.new(color.blue, transp=0), linewidth=4, title='Base Line', display = display.all)
+plot(close, offset=-displacement, color=color.new(color.black, transp=0), title='Lagging Span', style=plot.style_circles, linewidth=3, display = display.all)
+p1 = plot(leadLine1, offset=displacement, color=color.new(color.green, 0), title='Lead 1', display = display.all)
+p2 = plot(leadLine2, offset=displacement, color=color.new(color.red, 0), title='Lead 2', display = display.all)
+fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90), display = display.all)
 //END OF OFFICIAL ICHIMOKU PINE SCRIPT
 _curArrowDirection = if Kijun[0] - Kijun[1] > 0
     1
@@ -37,7 +37,7 @@ if _curArrowDirection != _existingArrowDirection
     _direction := _curArrowDirection
     _existingArrowDirection := _curArrowDirection
     _existingArrowDirection
-plotarrow(_direction, colorup=color.new(color.black, 35), colordown=color.new(color.black, 35), minheight=15, maxheight=15)
+plotarrow(_direction, colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), minheight=15, maxheight=15)
 //END OF COPY KIJUN ARROW
 
 KijunOffset = getMidPoint(basePeriodsK, 1)
@@ -45,25 +45,30 @@ _atrNumStop = input.int(3, 'Stop by No. ATR')
 _atrNumProfit = input.int(6, 'Profit by No. ATR')
 _atr = ta.atr(14)
 
+// chikou_span_filter = input.bool(true, "Chikou span filter")
 chikou_span_long = close[0] > close[displacement]
 chikou_span_short = close[0] < close[displacement]
 
-// longCondition = Kijun > KijunOffset and year >= _year and chikou_span_long //and strategy.position_size == 0 // and (strategy.position_size <= _maxPyramiding)
-// shortCondition = Kijun < KijunOffset and year >= _year and chikou_span_short //and strategy.position_size == 0// and (strategy.position_size <= _maxPyramiding)
-longCondition = _direction == 1 and year >= _year
-shortCondition = _direction == -1 and year >= _year
+kumo_long = close[0] > math.max(leadLine1,leadLine2)
+kumo_short = close[0] < math.min(leadLine1,leadLine2)
+
+longCondition = _direction == 1 and year >= _year and chikou_span_long and kumo_long
+shortCondition = _direction == -1 and year >= _year and chikou_span_short and kumo_short
 exitCondition = _existingArrowDirection == 1 and year >= _year
 __stopLossDis    = _atr * _atrNumStop
 __takeProfitDis  = _atr * _atrNumProfit
 _contract = contract == 0 ? strategy.initial_capital / close: contract //get contract no. based on initial capital is left to 0
-
+predefinedRR = input.bool(true, 'Use Predefined R/R')
 if(longCondition)
     strategy.close('S', comment = 'Close S')
     strategy.entry('L', strategy.long, _contract)
-    // strategy.exit("Exit L", "L", stop = close - __stopLossDis, limit = close + __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
+    if(predefinedRR)
+        strategy.exit("Exit L", "L", stop = close - __stopLossDis, limit = close + __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
 if (shortCondition)
     strategy.close('L', comment = 'Close L')
     strategy.entry('S', strategy.short, _contract)
-    // strategy.exit("Exit S", "S", stop = close + __stopLossDis, limit = close - __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
-// if (strategy.position_size > 0)
+    if(predefinedRR)
+        strategy.exit("Exit S", "S", stop = close + __stopLossDis, limit = close - __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
+
+
 
