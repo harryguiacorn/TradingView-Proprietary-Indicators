@@ -1,0 +1,59 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © LutherCoat
+
+//@version=5
+strategy("STRG-BBForce", initial_capital = 10000, overlay=true, margin_long=0, margin_short=0)
+//--------------- Built in BB Modified ---------------
+length = input.int(26, minval=1)
+src = input(close, title="Source")
+mult = input.float(2.0, minval=0.001, maxval=50, title="StdDev")
+basis = ta.sma(src, length)
+dev = mult * ta.stdev(src, length)
+upper = basis + dev
+lower = basis - dev
+offset = input.int(0, "Offset", minval = -500, maxval = 500)
+// fill(p1, p2, title = "Background", color=color.rgb(33, 150, 243, 95))
+//--------------- Built in BB Modified ---------------
+var existingCondition = 0
+condition1 = if upper[0] < upper[1] and lower[0] < lower[1] and basis[0] < basis[1]
+    -1
+condition2 = if upper[0] > upper[1] and lower[0] > lower[1] and basis[0] > basis[1]
+    1
+conditionFull = condition1?-1:condition2?1:na
+
+conditionMini = 0
+if conditionFull != existingCondition
+    conditionMini := conditionFull
+    existingCondition := conditionFull
+    existingCondition
+    
+// set conditionFull to show partial bands only when 3 elements point downwards
+// p1 = plot(upper, "Upper", color=color.new(color.blue, conditionFull==-1?0:conditionFull==1?0:100), offset = offset, style = plot.style_stepline, linewidth = 4)
+// plot(basis, "Basis", color=color.new(color.orange, conditionFull==-1?0:conditionFull==1?0:100), offset = offset, style = plot.style_stepline, linewidth = 4)
+// p2 = plot(lower, "Lower", color=color.new(color.blue, conditionFull==-1?0:conditionFull==1?0:100), offset = offset, style = plot.style_stepline, linewidth = 4)
+// plotarrow(conditionFull, 'Force', colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), maxheight = 15)
+
+p1 = plot(upper, "Upper", color=color.new(color.blue, 0), offset = offset, style = plot.style_stepline, linewidth = 4,display = display.all)
+plot(basis, "Basis", color=color.new(color.orange, 0), offset = offset, style = plot.style_stepline, linewidth = 4,display = display.none)
+p2 = plot(lower, "Lower", color=color.new(color.blue, 0), offset = offset, style = plot.style_stepline, linewidth = 4,display = display.all)
+
+plotarrow(conditionFull, 'Force Full', colorup=color.new(color.fuchsia, 0), colordown=color.new(color.fuchsia, 0), maxheight = 15,display = display.none)
+plotarrow(conditionMini, 'Force Mini', colorup=color.new(color.yellow, 0), colordown=color.new(color.yellow, 0), maxheight = 15)
+contracts = strategy.initial_capital / close // strategy.equity / close
+longCondition = conditionMini==1?true:false
+fromDate = input.int(2018, 'Look back since')
+partialProfitPerc = input.int(50,'Partial Profit %')
+if (longCondition and year >= fromDate)
+    strategy.close_all("CLOSE ALL")
+    strategy.entry("L", strategy.long,qty = contracts)
+strategy.exit("PARTIAL%", "L", qty_percent = partialProfitPerc, limit = upper, stop = lower)
+strategy.exit("Stop L","L", qty = math.abs(strategy.position_size), stop = lower) // position size can be negative and positive, it needs to be positive in this case
+
+shortCondition = conditionMini==-1?true:false
+if (shortCondition and year >= fromDate)
+    strategy.close_all("CLOSE ALL")
+    strategy.entry("S", strategy.short,qty = contracts)
+strategy.exit("PARTIAL%", "S", qty_percent = partialProfitPerc, limit = lower, stop = upper)
+strategy.exit("Stop S","S", qty = math.abs(strategy.position_size), stop = upper)
+
+// plotchar(strategy.position_size, char='❄') //allows for checking position size in data window
