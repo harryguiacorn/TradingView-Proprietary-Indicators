@@ -4,7 +4,7 @@
 ![BRK B_2022-10-25_12-34-26](https://user-images.githubusercontent.com/1398153/197763143-523ed510-b02b-4715-bea4-472ceb90acdc.png)
 
 ### Kijun Arrow ###
-This indicator paints an arrow below or above the candlestick when Kijun-sen changes to a new direction.
+This indicator paints an arrow below or above the candlestick when Kijun-sen changes to a new direction. The rest of the elements are bog-standard Ichimoku Cloud settings.
 ### Quantity Quality Commitment (QQC) ###
 The QQC aims to gauge the underlying strength of momentum by looking at 3 metrics: quantity, quality and commitment.
 * **Quantity**: a tally of bullish versus bearish candlesticks for defined periods.
@@ -31,4 +31,5 @@ The QQC aims to gauge the underlying strength of momentum by looking at 3 metric
 
 ### Disclaimer ###
 The content and materials are for your information and education only and not financial advice or recommendation.
+
 
