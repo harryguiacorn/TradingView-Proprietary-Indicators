@@ -1,11 +1,11 @@
 //@version=5
 //Buy and sell depending on K arrow, no pyramiding, keep it simple.
 _maxPyramiding = 0
-strategy('STRG-Kijun', overlay=true, initial_capital = 10000, pyramiding=_maxPyramiding, default_qty_value = 0)
+strategy('STRG-Kijun', overlay=true, initial_capital = 100000, pyramiding=_maxPyramiding, default_qty_value = 0)
 _year = input.int(2018, minval=1, title='Look back since(yr)')
 chikou_span_filter = input.bool(true, "Chikou span filter")
-kumo_filter = input.bool(true, "Kumo filter")
-predefinedRR = input.bool(true, 'Use Predefined R/R')
+kumo_filter = input.bool(false, "Kumo filter")
+predefinedRR = input.bool(false, 'Use Predefined R/R')
 _atrNumStop = input.int(3, 'Stop by No. ATR')
 _atrNumProfit = input.int(6, 'Profit by No. ATR')
 _atr = ta.atr(14)
@@ -57,12 +57,14 @@ kumo_long   = close[0] > kumo_top
 kumo_short  = close[0] < kumo_bottom
 // plotshape(leadLine2[displacement], 'KUMO')
 
-longCondition   = _direction == 1   and year >= _year 
-shortCondition  = _direction == -1  and year >= _year
+longConditionK   = _direction == 1   and year >= _year 
+shortConditionK  = _direction == -1  and year >= _year
+longCondition  = longConditionK
+shortCondition = shortConditionK
 if chikou_span_filter and kumo_filter == false
     longCondition   := _direction == 1  and year >= _year and chikou_span_long 
     shortCondition  := _direction == -1 and year >= _year and chikou_span_short 
-if kumo_filter and chikou_span_filter ==false
+if kumo_filter and chikou_span_filter == false
     longCondition   := _direction == 1  and year >= _year and kumo_long
     shortCondition  := _direction == -1 and year >= _year and kumo_short
 if chikou_span_filter and kumo_filter
@@ -72,22 +74,23 @@ if chikou_span_filter and kumo_filter
 exitCondition = _existingArrowDirection == 1 and year >= _year
 __stopLossDis    = _atr * _atrNumStop
 __takeProfitDis  = _atr * _atrNumProfit
-_contract = contract == 0 ? strategy.initial_capital / close: contract //get contract no. based on initial capital is left to 0
+_contract = contract == 0 ? strategy.initial_capital / close: contract //get contract no. based on initial capital if left to 0
 
 if longCondition
     strategy.close('S', comment = 'Close S')
     strategy.entry('L', strategy.long, _contract)
+    alert("Go long at " + str.tostring(close, "#.00)"))
     if(predefinedRR)
         strategy.exit("Exit L", "L", stop = close - __stopLossDis, limit = close + __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
-// if(predefinedRR ==false and strategy.position_size>0) //exit long position once price closes below kumo
-//     strategy.exit("Exit L", "L", stop = kumo_bottom, comment_loss = 'StopLoss')
 
 if shortCondition
     strategy.close('L', comment = 'Close L')
     strategy.entry('S', strategy.short, _contract)
+    alert("Go short at " + str.tostring(close, "#.00)"))
     if(predefinedRR)
         strategy.exit("Exit S", "S", stop = close + __stopLossDis, limit = close - __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
-// if(predefinedRR ==false and strategy.position_size<0) //exit short position once price closes above kumo
-//     strategy.exit("Exit S", "S", stop = kumo_top, comment_loss = 'StopLoss')
-
+if(predefinedRR == false and strategy.position_size>0 and shortConditionK) //exit long position once K turns south
+    strategy.close('L', comment = 'Stoploss L')
+if(predefinedRR == false and strategy.position_size<0 and longConditionK) //exit short position once K turns north
+    strategy.close('S', comment = 'Stoploss S')
 
