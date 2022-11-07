@@ -12,7 +12,7 @@ The QQC aims to gauge the underlying strength of momentum by looking at 3 metric
 * **Commitment**: the prior two metrics can send out a false sense of direction if there’s little volume, as lack of volume builds an unsteady momentum, therefore, this element takes the volume into the equation to paint a final picture from 3 aspects.
 * **ADX**: if ADX is above 20, it's deemed to be in a trendy environment, otherwise it's not trendy and the price action would likely be choppy; this indicator is shown in histogram format. 
 
-### Bollinger Bands Force ###
+### Bollinger Bands Force (BBForce) ###
 ![SPX_2022-11-04_21-18-11](https://user-images.githubusercontent.com/1398153/200076350-e9a4cb3b-334c-485e-9b4f-d881f478a3de.png)
 The Bollinger Bands are formed of 3 elements: a simple moving average with +2 and -2 Standard deviation lines above and below. When all three are stepping into the same direction, a Bollinger Bands Force arrow is printed on the chart denoting the forces are all in line. The default setting of the moving average has been modified to 26 rather than 20.
 The fuchsia arrows are printed whenever aforementioned 3 elements are in sync.
