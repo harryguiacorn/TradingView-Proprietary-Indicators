@@ -3,6 +3,12 @@
 _maxPyramiding = 0
 strategy('STRG-Kijun', overlay=true, initial_capital = 10000, pyramiding=_maxPyramiding, default_qty_value = 0)
 _year = input.int(2018, minval=1, title='Look back since(yr)')
+chikou_span_filter = input.bool(true, "Chikou span filter")
+kumo_filter = input.bool(true, "Kumo filter")
+predefinedRR = input.bool(true, 'Use Predefined R/R')
+_atrNumStop = input.int(3, 'Stop by No. ATR')
+_atrNumProfit = input.int(6, 'Profit by No. ATR')
+_atr = ta.atr(14)
 contract = input.int(0, minval=0, title='Contract size')
 //BEGINING OF COPY KIJUN ARROW
 conversionPeriods = input.int(9, minval=1, title='Conversion Line Periods')
@@ -41,34 +47,47 @@ plotarrow(_direction, colorup=color.new(color.black, 0), colordown=color.new(col
 //END OF COPY KIJUN ARROW
 
 KijunOffset = getMidPoint(basePeriodsK, 1)
-_atrNumStop = input.int(3, 'Stop by No. ATR')
-_atrNumProfit = input.int(6, 'Profit by No. ATR')
-_atr = ta.atr(14)
 
-// chikou_span_filter = input.bool(true, "Chikou span filter")
-chikou_span_long = close[0] > close[displacement]
-chikou_span_short = close[0] < close[displacement]
+chikou_span_long    = close[0] > close[displacement]
+chikou_span_short   = close[0] < close[displacement]
 
-kumo_long = close[0] > math.max(leadLine1,leadLine2)
-kumo_short = close[0] < math.min(leadLine1,leadLine2)
+kumo_top = math.max(leadLine1[displacement],leadLine2[displacement])
+kumo_bottom = math.min(leadLine1[displacement],leadLine2[displacement])
+kumo_long   = close[0] > kumo_top
+kumo_short  = close[0] < kumo_bottom
+// plotshape(leadLine2[displacement], 'KUMO')
 
-longCondition = _direction == 1 and year >= _year and chikou_span_long and kumo_long
-shortCondition = _direction == -1 and year >= _year and chikou_span_short and kumo_short
+longCondition   = _direction == 1   and year >= _year 
+shortCondition  = _direction == -1  and year >= _year
+if chikou_span_filter and kumo_filter == false
+    longCondition   := _direction == 1  and year >= _year and chikou_span_long 
+    shortCondition  := _direction == -1 and year >= _year and chikou_span_short 
+if kumo_filter and chikou_span_filter ==false
+    longCondition   := _direction == 1  and year >= _year and kumo_long
+    shortCondition  := _direction == -1 and year >= _year and kumo_short
+if chikou_span_filter and kumo_filter
+    longCondition   := _direction == 1  and year >= _year and chikou_span_long  and kumo_long
+    shortCondition  := _direction == -1 and year >= _year and chikou_span_short and kumo_short
+
 exitCondition = _existingArrowDirection == 1 and year >= _year
 __stopLossDis    = _atr * _atrNumStop
 __takeProfitDis  = _atr * _atrNumProfit
 _contract = contract == 0 ? strategy.initial_capital / close: contract //get contract no. based on initial capital is left to 0
-predefinedRR = input.bool(true, 'Use Predefined R/R')
-if(longCondition)
+
+if longCondition
     strategy.close('S', comment = 'Close S')
     strategy.entry('L', strategy.long, _contract)
     if(predefinedRR)
         strategy.exit("Exit L", "L", stop = close - __stopLossDis, limit = close + __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
-if (shortCondition)
+// if(predefinedRR ==false and strategy.position_size>0) //exit long position once price closes below kumo
+//     strategy.exit("Exit L", "L", stop = kumo_bottom, comment_loss = 'StopLoss')
+
+if shortCondition
     strategy.close('L', comment = 'Close L')
     strategy.entry('S', strategy.short, _contract)
     if(predefinedRR)
         strategy.exit("Exit S", "S", stop = close + __stopLossDis, limit = close - __takeProfitDis, comment_loss = 'StopLoss', comment_profit = 'Profit')
-
+// if(predefinedRR ==false and strategy.position_size<0) //exit short position once price closes above kumo
+//     strategy.exit("Exit S", "S", stop = kumo_top, comment_loss = 'StopLoss')
 
 
