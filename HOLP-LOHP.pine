@@ -1,0 +1,35 @@
+//@version=5
+indicator('HOLP-LOHP', shorttitle='HOLP-LOHP', format=format.price, precision=0, overlay=true)
+_p = input.int(title='Lookback Periods', defval=10, minval=2)
+var _boolNewLow = 0
+_sessionLow = 0.0
+lastLoBar = -ta.lowestbars(low, _p + 1)
+if low[0] < ta.lowest(_p)[1]
+    _sessionLow := low[0]
+    _boolNewLow := 1
+    _boolNewLow
+_arrowHOLP = 0.0
+if close[0] > high[lastLoBar]
+    if _boolNewLow == 1
+        _arrowHOLP := close[0]
+        _boolNewLow := 0
+        _boolNewLow
+plotshape(_sessionLow, style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+plotshape(_arrowHOLP, style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small)
+
+var _boolNewHigh = 0
+_sessionHigh = 0.0
+lastHiBar = -ta.highestbars(high, _p + 1)
+if high[0] > ta.highest(_p)[1]
+    _sessionHigh := high[0]
+    _boolNewHigh := 1
+    _boolNewHigh
+_arrowLOHP = 0.0
+if close[0] < low[lastHiBar]
+    if _boolNewHigh == 1
+        _arrowLOHP := close[0]
+        _boolNewHigh := 0
+        _boolNewHigh
+plotshape(_sessionHigh, style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+plotshape(_arrowLOHP, style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small)
+
