@@ -30,7 +30,11 @@ if high[0] > ta.highest(_p)[1]
     _sessionHigh := high
     _boolNewHigh := 1
 _arrowLOHP = 0.0
-_conditionLOHP = _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < low[lastHiBar + 1]
+_conditionLOHP = if _b2bar
+    _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < low[lastHiBar + 1] 
+else 
+    _boolNewHigh == 1 and close[0] < low[lastHiBar]
+
 if _conditionLOHP
     _arrowLOHP := close
     _boolNewHigh := 0
