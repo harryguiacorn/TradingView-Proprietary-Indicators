@@ -1,6 +1,8 @@
 //@version=5
 indicator('HOLP-LOHP', shorttitle='HOLP-LOHP', format=format.price, precision=0, overlay=true)
 _p = input.int(title='Lookback Periods', defval=10, minval=2)
+_bPivot = input.bool(true, 'Display Pivot Point')
+_bHOLPLOHP = input.bool(true, 'Display HOLP/LOHP signal')
 _b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
 
 var _boolNewLow = 0
@@ -18,7 +20,8 @@ else
 if _conditionHOLP
     _arrowHOLP := close
     _boolNewLow := 0
-    label.new(bar_index[lastLoBar], na, "▲\n" + str.tostring(low[lastLoBar], format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+    if _bPivot
+        label.new(bar_index[lastLoBar], na, "▲\n" + str.tostring(low[lastLoBar], format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
 
 var _boolNewHigh = 0
 _sessionHigh = 0.0
@@ -31,9 +34,10 @@ _conditionLOHP = _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < 
 if _conditionLOHP
     _arrowLOHP := close
     _boolNewHigh := 0
-    label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+    if _bPivot
+        label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-plotshape(_conditionLOHP,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
-plotshape(_conditionHOLP,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
 plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
