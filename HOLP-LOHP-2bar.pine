@@ -1,0 +1,34 @@
+//@version=5
+indicator('HOLP-LOHP-2bar', shorttitle='HOLP-LOHP-2', format=format.price, precision=0, overlay=true)
+_p = input.int(title='Lookback Periods', defval=10, minval=2)
+
+var _boolNewLow = 0
+_sessionLow = 0.0
+lastLoBar = -ta.lowestbars(low, _p + 1)
+if low[0] < ta.lowest(_p)[1]
+    _sessionLow := low
+    _boolNewLow := 1
+_arrowHOLP = 0.0
+_conditionHOLP = _boolNewLow == 1 and close[0] > high[lastLoBar] and close[0] > high[lastLoBar + 1] // The HOLP needs to close above the highs of session low bar and its prior bar, hence it's name
+if _conditionHOLP
+    _arrowHOLP := close
+    _boolNewLow := 0
+    label.new(bar_index[lastLoBar], na, "▲\n" + str.tostring(low[lastLoBar], format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+var _boolNewHigh = 0
+_sessionHigh = 0.0
+lastHiBar = -ta.highestbars(high, _p + 1)
+if high[0] > ta.highest(_p)[1]
+    _sessionHigh := high
+    _boolNewHigh := 1
+_arrowLOHP = 0.0
+_conditionLOHP = _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < low[lastHiBar + 1]
+if _conditionLOHP
+    _arrowLOHP := close
+    _boolNewHigh := 0
+    label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+plotshape(_conditionLOHP,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_conditionHOLP,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
