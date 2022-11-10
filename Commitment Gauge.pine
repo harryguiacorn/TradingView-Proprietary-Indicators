@@ -1,0 +1,38 @@
+//@version=4
+study('Commitment Gauge', overlay=false)
+
+//Philosophy: one of the most basic forms of looking at battalfield result is to look at close vs open price,
+//if it's a bullish candle, not matter how small the victory is, a victory in that time slot allowed nevertheless.
+//This indicator counts the number of bullish candles vs bearish ones over the default period of past 9 bars.
+lenLookBack = input(title="Look Back Period", type=input.integer, defval=9, minval=1)
+bDisplayVolumeLabels = input(title="Display Volume Labels", type=input.bool, defval=false)
+bDisplayHist = input(title="Toggle Hist/Arrow", type=input.bool, defval=false)
+
+//@version=4
+//Philosophy: rank the assertiveness based on the candle body vs whole candle range ratio,
+//so a doji would have a ranking of 1 since open and close are the same, a Marubozu would get 100%.
+
+//study('Energy Shift', overlay=true)
+indexCountStartEnergyShift = 0
+
+float sumBodyPercentage = 0, float sumBodyVolumePercentage = 0, float sumBodyVolumePercentagePoint = 0
+float rangeCandleBody = 0
+float bodyPercentage = 0, float bodyVolumePercentage = 0, float bodyVolumePercentagePoint = 0
+
+for x = indexCountStartEnergyShift to lenLookBack - 1
+    rangeCandleBody     = close[x]  - open[x]
+    rangeCandleWhole    = high[x]   - low[x]
+    bodyPercentage      = nz(rangeCandleBody / rangeCandleWhole * 100)
+    sumBodyPercentage   := sumBodyPercentage + bodyPercentage
+    bodyVolumePercentagePoint       = sumBodyPercentage * volume[x] * abs(rangeCandleBody)
+    sumBodyVolumePercentagePoint    := sumBodyVolumePercentagePoint + bodyVolumePercentagePoint
+series_green_shift    = sumBodyVolumePercentagePoint > 0
+series_red_shift      = sumBodyVolumePercentagePoint < 0
+plot(bDisplayHist? sumBodyVolumePercentagePoint : na, style=plot.style_columns, transp=0)
+plotshape(bDisplayHist? na: series_green_shift, style=shape.triangleup,     transp=0, location=location.bottom, color=color.orange, size = size.small)//#f57f17
+plotshape(bDisplayHist? na: series_red_shift,   style=shape.triangledown,   transp=0, location=location.bottom, color=color.purple, size = size.small)
+
+if(sumBodyVolumePercentagePoint > 0 and bDisplayVolumeLabels)
+    label.new(bar_index[indexCountStartEnergyShift], low,  tostring(sumBodyVolumePercentagePoint), style=label.style_labelup,     yloc=yloc.belowbar, color=color.orange)
+if(sumBodyVolumePercentagePoint < 0 and bDisplayVolumeLabels)
+    label.new(bar_index[indexCountStartEnergyShift], high, tostring(sumBodyVolumePercentagePoint), style=label.style_labeldown,   yloc=yloc.abovebar, color=color.silver)
