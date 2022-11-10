@@ -1,0 +1,25 @@
+//@version=4
+study('Candle Count with labels', overlay=true)
+
+bShowAll = input(title="Show all countings", type=input.bool, defval=false)
+lenH = input(title="Look Back Period", type=input.integer, defval=9, minval=1)
+indexCountStart = 0
+
+labelCandle(src, len) =>
+    posY = nz(src[len])
+    count_green = 0
+    count_red = 0
+    for x = indexCountStart to len - 1
+        isGreen = close[x] > open[x]
+        isRed = close[x] < open[x]
+        if isGreen
+            count_green := count_green + 1
+        if isRed
+            count_red := count_red + 1
+    if count_green > count_red or bShowAll
+        label.new(bar_index[indexCountStart], posY*20, tostring(count_green), style=label.style_labelup, yloc=yloc.belowbar, color=color.lime)
+       
+    if count_green < count_red or bShowAll
+        label.new(bar_index[indexCountStart], posY, tostring(count_red), style=label.style_labeldown, yloc=yloc.abovebar, color=color.red)
+   
+labelCandle(high, lenH)
