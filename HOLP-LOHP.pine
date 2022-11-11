@@ -1,8 +1,8 @@
 //@version=5
 indicator('HOLP-LOHP', shorttitle='HOLP-LOHP', format=format.price, precision=0, overlay=true)
-_p = input.int(title='Lookback Periods', defval=10, minval=2)
 _bPivot = input.bool(true, 'Display Pivot Point')
 _bHOLPLOHP = input.bool(true, 'Display HOLP/LOHP signal')
+_p = input.int(title='Lookback Periods', defval=10, minval=2)
 _b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
 
 var _boolNewLow = 0
