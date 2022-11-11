@@ -1,0 +1,25 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+
+//@version=5
+indicator("Candlestick - Kicker Pattern", shorttitle = 'Kicker', overlay = true)
+_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation')
+_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation')
+
+getRange(x, y) => math.abs(x - y)
+
+condition_kicker_up_threshold = open[1] > close[1] and 
+                                 open < close and 
+                                 open > open[1] and 
+                                 low > low[1] and
+                                 getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> _bodyPencLeft and
+                                 getRange(open, close)/getRange(high, low) * 100> _bodyPencRight
+condition_kicker_dn_threshold = open[1] < close[1] and 
+                                 open > close and 
+                                 open < open[1] and 
+                                 high < high[1] and
+                                 getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> _bodyPencLeft and
+                                 getRange(open, close)/getRange(high, low) * 100> _bodyPencRight
+
+plotshape(condition_kicker_up_threshold?close:na, 'kicker up', style = shape.circle, location = location.belowbar, size = size.auto, color = color.blue)
+plotshape(condition_kicker_dn_threshold?close:na, 'kicker up', style = shape.circle, location = location.abovebar, size = size.auto, color = color.red)
