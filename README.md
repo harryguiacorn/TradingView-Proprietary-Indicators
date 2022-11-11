@@ -30,9 +30,11 @@ The QQC aims to gauge the underlying strength of momentum by looking at 3 metric
 * The default look back period is set to 10 here, albeit John Carter didn’t specify a hard coded number but rather the use of experience and common sense.
 
 ### Candlestick Kicker Pattern ###
+![AMZN_2022-11-11_16-15-14](https://user-images.githubusercontent.com/1398153/201383575-4ae922dd-eba4-40b6-a096-4d113349c1f9.png)
+
 Not many candlestick patterns hurt traders on the other side of the trade more than this signal, when it happens, think of it as kicking in the teeth, the pain is real.
 
-An upwards signal is painted when you have a two-bar formation, the one on the left is a bearish one whereas the successive one is bullish, when you have fat bodies in both candles, meaning the open is close to the high and the close is close to the low for the first candle, while the open is close to the low and the close is close to the high for the adjacent candle , the pain is ever more excruciating, the other important condition is the open of the first candle must be lower than the open of the latter one.
+An upwards signal is painted when you have a two-bar formation, the one on the left is a bearish one whereas the successive one is bullish, when you have fat bodies in both candles, meaning the open is close to the high and the close is close to the low for the first candle, while the open is close to the low and the close is close to the high for the adjacent candle, the pain is ever more excruciating, the other important condition is the open of the first candle must be lower than the open of the latter one.
 
 The downwards signal is vice versa of the upwards signal.
 
