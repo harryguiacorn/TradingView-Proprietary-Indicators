@@ -1,43 +1,48 @@
 //@version=5
 indicator('Kijun Arrow', overlay=true)
-conversionPeriods = input.int(9, minval=1, title='Conversion Line Periods')
-basePeriodsK = input.int(26, minval=1, title='Base Line Periods')
-getMidPoint(_len, __offset) =>
-    MidPointOffset = math.avg(ta.lowest(_len)[__offset], ta.highest(_len)[__offset])
+conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
+basePeriodsK = input.int(26, minval=1, title='Kijun-Sen (Base Line) Periods')
+getMidPoint(__len, __offset) =>
+    MidPointOffset = math.avg(ta.lowest(__len)[__offset], ta.highest(__len)[__offset])
     MidPointOffset
 Kijun = getMidPoint(basePeriodsK, 0)
 //MODIFIED FROM OFFICIAL ICHIMOKU PINE SCRIPT
-laggingSpan2Periods = input.int(52, minval=1, title='Lagging Span 2 Periods')
-displacement = input.int(26, minval=1, title='Displacement')
+senkou2Periods = input.int(52, minval=1, title='Senkou Span 2 Periods')
+_displacement = input.int(26, minval=1, title='_Displacement')
 donchian(len) =>
     math.avg(ta.lowest(len), ta.highest(len))
 conversionLine = donchian(conversionPeriods)
 baseLine = donchian(basePeriodsK)
 leadLine1 = math.avg(conversionLine, baseLine)
-leadLine2 = donchian(laggingSpan2Periods)
-plot(conversionLine, color=color.new(color.fuchsia, 0), linewidth=2, title='Conversion Line')
-plot(baseLine, color=color.new(color.blue, 0), linewidth=4, title='Base Line')
-plot(close, offset=-displacement, color=color.new(color.black, 0), title='Lagging Span', style=plot.style_circles, linewidth=3)
-p1 = plot(leadLine1, offset=displacement, color=color.new(color.green, 0), title='Lead 1')
-p2 = plot(leadLine2, offset=displacement, color=color.new(color.red, 0), title='Lead 2')
+leadLine2 = donchian(senkou2Periods)
+plot(conversionLine, color=color.new(color.fuchsia, 0), linewidth=2, title='Tenkan-Sen (Conversion Line)')
+plot(baseLine, color=color.new(color.blue, 0), linewidth=4, title='Kijun-Sen (Base Line)')
+plot(close, offset=-_displacement, color=color.new(color.black, 0), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
+p1 = plot(leadLine1, offset=_displacement, color=color.new(color.green, 0), title='Senkou Span (Lead 1)')
+p2 = plot(leadLine2, offset=_displacement, color=color.new(color.red, 0), title='Senkou Span (Lead 2)')
 fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
 //END OF OFFICIAL ICHIMOKU PINE SCRIPT
-_curArrowDirection = if Kijun[0] - Kijun[1] > 0
+int _curArrowDirection = if Kijun[0] - Kijun[1] > 0
     1
 else if Kijun[0] - Kijun[1] < 0
     -1
 var _existingArrowDirection = 0
-_direction = 0
+int _newDirection = 0
 if _curArrowDirection != _existingArrowDirection
-    _direction := _curArrowDirection
+    _newDirection := _curArrowDirection
     _existingArrowDirection := _curArrowDirection
     _existingArrowDirection
-plotarrow(_direction, title='Kijun Arrow', colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), minheight=15, maxheight=15)
+
+bool _bChikouSpanLn    = close[0] > close[_displacement]
+bool _bChikouSpanSt   = close[0] < close[_displacement]
+
+bool _bNewDirection = _newDirection==0?false:true // find out if it's a new direction, be it downards or upwards
+
+plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), minheight=15, maxheight=15)
+plot(_bChikouSpanLn and _bNewDirection ?close:na, offset=-_displacement, color=color.new(color.yellow, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanSt and _bNewDirection ?close:na, offset=-_displacement, color=color.new(color.blue, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
 
 //---------------------- Candlestick Kicker --------------------------
-
-
-
 
 
 //---------------------- Candlestick Kicker --------------------------
