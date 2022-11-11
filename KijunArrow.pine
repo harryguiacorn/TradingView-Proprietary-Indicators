@@ -8,7 +8,7 @@ getMidPoint(__len, __offset) =>
 Kijun = getMidPoint(basePeriodsK, 0)
 //MODIFIED FROM OFFICIAL ICHIMOKU PINE SCRIPT
 senkou2Periods = input.int(52, minval=1, title='Senkou Span 2 Periods')
-_displacement = input.int(26, minval=1, title='_Displacement')
+_displacement = input.int(26, minval=1, title='Displacement')
 donchian(len) =>
     math.avg(ta.lowest(len), ta.highest(len))
 conversionLine = donchian(conversionPeriods)
@@ -17,7 +17,7 @@ leadLine1 = math.avg(conversionLine, baseLine)
 leadLine2 = donchian(senkou2Periods)
 plot(conversionLine, color=color.new(color.fuchsia, 0), linewidth=2, title='Tenkan-Sen (Conversion Line)')
 plot(baseLine, color=color.new(color.blue, 0), linewidth=4, title='Kijun-Sen (Base Line)')
-plot(close, offset=-_displacement, color=color.new(color.black, 0), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
+plot(close, offset=-_displacement, color=color.new(color.black, 50), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
 p1 = plot(leadLine1, offset=_displacement, color=color.new(color.green, 0), title='Senkou Span (Lead 1)')
 p2 = plot(leadLine2, offset=_displacement, color=color.new(color.red, 0), title='Senkou Span (Lead 2)')
 fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
@@ -36,46 +36,81 @@ if _curArrowDirection != _existingArrowDirection
 bool _bChikouSpanLn    = close[0] > close[_displacement]
 bool _bChikouSpanSt   = close[0] < close[_displacement]
 
-bool _bNewDirection = _newDirection==0?false:true // find out if it's a new direction, be it downards or upwards
-
 plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), minheight=15, maxheight=15)
-plot(_bChikouSpanLn and _bNewDirection ?close:na, offset=-_displacement, color=color.new(color.yellow, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
-plot(_bChikouSpanSt and _bNewDirection ?close:na, offset=-_displacement, color=color.new(color.blue, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanLn and _newDirection==1 ?close:na, offset=-_displacement, color=color.new(color.yellow, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanSt and _newDirection==-1 ?close:na, offset=-_displacement, color=color.new(color.blue, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
 
-//---------------------- Candlestick Kicker --------------------------
+//---------------------- COPY OF Candlestick Kicker --------------------------
 
+bool enableKicker = input.bool(true, 'Enable Candlestick Kicker Pattern')
+_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation')
+_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation')
 
-//---------------------- Candlestick Kicker --------------------------
+getRange(x, y) => math.abs(x - y)
 
-//---------------COPY OF HOLP--------------//Commented out as new Pinescript threw errors in them.
-// lenLookBackHOLPLOHP = input(title="HOLP/LOHP Look Back Period", defval=10, minval=2, type=input.integer)
-// bDisplayHOLP = input(title="Display HOLP/LOHP", type=input.bool, defval=true)
-// var _boolNewLow = 0
-// _sessionLow = 0.0
-// lastLoBar = - lowestbars(lenLookBackHOLPLOHP + 1)
-// if (low[0] < lowest(lenLookBackHOLPLOHP)[1])
-//     _sessionLow := low[0]
-//     _boolNewLow := 1
-// _arrowHOLP = 0.0
-// _indexLastLoBar = (round(lastLoBar))
-// if (close[0] > high[lastLoBar]) and (low[lastLoBar] >=  lowest(lenLookBackHOLPLOHP + _indexLastLoBar)) //( (lowest(lenLookBackHOLPLOHP)[1] < low[lenLookBackHOLPLOHP])
-//     if (_boolNewLow == 1)
-//         _arrowHOLP  := close[0]
-//         _boolNewLow := 0
-// plotshape(bDisplayHOLP?_arrowHOLP:na, title = "HOLP Circle", style=shape.circle, location=location.belowbar, offset=0, color=color.maroon, transp=0, size = size.small)
+condition_kicker_up_threshold = open[1] > close[1] and 
+                                 open < close and 
+                                 open > open[1] and 
+                                 low > low[1] and
+                                 getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> _bodyPencLeft and
+                                 getRange(open, close)/getRange(high, low) * 100> _bodyPencRight
+condition_kicker_dn_threshold = open[1] < close[1] and 
+                                 open > close and 
+                                 open < open[1] and 
+                                 high < high[1] and
+                                 getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> _bodyPencLeft and
+                                 getRange(open, close)/getRange(high, low) * 100> _bodyPencRight
+plotshape(condition_kicker_up_threshold?close:na, 'kicker upwards', style = shape.circle, location = location.belowbar, size = size.auto, color = color.green, display = enableKicker?display.all:display.data_window)
+plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = shape.circle, location = location.abovebar, size = size.auto, color = color.red, display = enableKicker?display.all:display.data_window)
 
-// var _boolNewHigh = 0
-// _sessionHigh = 0.0
-// lastHiBar = - highestbars(lenLookBackHOLPLOHP + 1)
-// if (high[0] > highest(lenLookBackHOLPLOHP)[1])
-//     _sessionHigh := high[0]
-//     _boolNewHigh := 1
-// _arrowLOHP = 0.0
-// _indexLastHiBar = (round(lastHiBar))
-// if (close[0] < low[lastHiBar]) and (high[lastHiBar] >=  highest(lenLookBackHOLPLOHP + _indexLastHiBar)) //(highest(lenLookBackHOLPLOHP)[1] > high[lenLookBackHOLPLOHP])
-//     if (_boolNewHigh == 1)
-//         _arrowLOHP  := close[0]
-//         _boolNewHigh := 0
-// plotshape(bDisplayHOLP?_arrowLOHP:na, title = "LOHP Circle", style=shape.circle, location=location.abovebar, offset=0, color=color.maroon, transp=0, size = size.small)
+//---------------------- COPY OF Candlestick Kicker --------------------------
+
+//---------------COPY OF HOLP--------------
+_bPivot = input.bool(true, 'Display Pivot Point')
+_bHOLPLOHP = input.bool(true, 'Display HOLP/LOHP signal')
+_p = input.int(title='Lookback Periods', defval=10, minval=2)
+_b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
+
+var _boolNewLow = 0
+_sessionLow = 0.0
+lastLoBar = -ta.lowestbars(low, _p + 1)
+if low[0] < ta.lowest(_p)[1]
+    _sessionLow := low
+    _boolNewLow := 1
+_arrowHOLP = 0.0
+_conditionHOLP = if _b2bar
+    _boolNewLow == 1 and close[0] > high[lastLoBar] and close[0] > high[lastLoBar + 1] // The HOLP needs to close above the highs of session low bar and its prior bar, hence it's name
+else 
+    _boolNewLow == 1 and close[0] > high[lastLoBar] // The HOLP needs to close above the highs of session low bar
+
+if _conditionHOLP
+    _arrowHOLP := close
+    _boolNewLow := 0
+    if _bPivot
+        label.new(bar_index[lastLoBar], na, "▲\n" + str.tostring(low[lastLoBar], format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+var _boolNewHigh = 0
+_sessionHigh = 0.0
+lastHiBar = -ta.highestbars(high, _p + 1)
+if high[0] > ta.highest(_p)[1]
+    _sessionHigh := high
+    _boolNewHigh := 1
+_arrowLOHP = 0.0
+_conditionLOHP = if _b2bar
+    _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < low[lastHiBar + 1] 
+else 
+    _boolNewHigh == 1 and close[0] < low[lastHiBar]
+
+if _conditionLOHP
+    _arrowLOHP := close
+    _boolNewHigh := 0
+    if _bPivot
+        label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+
 //---------------COPY OF HOLP--------------
 
