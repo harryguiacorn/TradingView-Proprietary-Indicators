@@ -37,8 +37,8 @@ bool _bChikouSpanLn    = close[0] > close[_displacement]
 bool _bChikouSpanSt   = close[0] < close[_displacement]
 
 plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), minheight=15, maxheight=15)
-plot(_bChikouSpanLn and _newDirection==1 ?close:na, offset=-_displacement, color=color.new(color.yellow, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
-plot(_bChikouSpanSt and _newDirection==-1 ?close:na, offset=-_displacement, color=color.new(color.blue, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanLn and _newDirection==1 ?close:na, offset=-_displacement, color=color.new(color.orange, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanSt and _newDirection==-1 ?close:na, offset=-_displacement, color=color.new(color.purple, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
 
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
