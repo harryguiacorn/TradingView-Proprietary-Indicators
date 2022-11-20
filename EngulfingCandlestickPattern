@@ -1,0 +1,61 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+
+//@version=5
+indicator(title="Engulfing Candlestick Pattern", shorttitle="Engulfing", overlay=true)
+
+// Options for setting the minimum requirement of candlestick body to range percentage.
+// It's less important for the left formation to have a fat body.
+// However, for the right formation, namely the engulfing candle, 
+// we want to see higher percentage of body to price range and small wicks
+min_body_to_range_pct_lt   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to price range percentage for the left formation')
+min_body_to_range_pct_rt  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to price range percentage for the right formation')
+
+// Only show engulfing signal if the body of the engulfing candle is larger than 1 Average True Range(ATR)
+// The idea is we prefer engulfing candles that show dominance and mean business.
+filter_by_atr = input.bool(false, "Only display superior engulfing signals", "Only display engulfing candles whose body range is larger than 1 ATR")
+
+display_body_to_range_label = input.bool(false, "Display body to price range percentage")
+display_body_range_label = input.bool(false, "Display body of price range")
+
+getRange(x, y) => math.abs(x - y)
+
+atr = ta.atr(14)
+
+engulfing_cond_dn = open >= close[1] and 
+                     close <= open[1] and 
+                     open > close and 
+                     open[1] < close[1] and 
+                     getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> min_body_to_range_pct_lt and
+                     getRange(open, close)/getRange(high, low) * 100> min_body_to_range_pct_rt
+con_dn = engulfing_cond_dn
+if filter_by_atr and engulfing_cond_dn
+    con_dn := getRange(open, close)>atr?true:false
+
+engulfing_cond_up = open <= close[1] and 
+                     close >= open[1] and 
+                     open < close and 
+                     open[1] > close[1] and
+                     getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> min_body_to_range_pct_lt and
+                     getRange(open, close)/getRange(high, low) * 100> min_body_to_range_pct_rt
+
+con_up = engulfing_cond_up
+if filter_by_atr and engulfing_cond_up
+    con_up := getRange(open, close)>atr?true:false
+
+// Display engulfing body percentage in comparison with its range (high and low)
+if display_body_to_range_label and (engulfing_cond_dn or engulfing_cond_up)
+    label.new(bar_index, engulfing_cond_dn?high:low, 
+                 str.tostring(math.ceil(getRange(open, close)/getRange(high, low) * 100)) + "%", 
+                 yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
+                 style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
+
+// Display engulfing body in points
+if display_body_range_label and (engulfing_cond_dn or engulfing_cond_up)
+    label.new(bar_index, engulfing_cond_dn?high:low, 
+                 "body:" + str.tostring(getRange(open, close)) + "\natr:" + str.tostring(atr), 
+                 yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
+                 style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
+
+plotshape(con_dn, "Bearish Engulfing Circle", shape.circle, location.abovebar, color = color.blue, size = size.auto) // text = "Engulfing"
+plotshape(con_up, "Bullish Engulfing Circle", shape.circle, location.belowbar, color = color.blue, size = size.auto) // text = "Engulfing"
