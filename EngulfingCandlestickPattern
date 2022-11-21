@@ -2,7 +2,7 @@
 // © FxCloudTrader
 
 //@version=5
-indicator(title="Engulfing Candlestick Pattern", shorttitle="Engulfing", overlay=true)
+indicator(title="Engulfing Candlestick Pattern", shorttitle="Engulfing", overlay=true, precision = 0)
 
 // Options for setting the minimum requirement of candlestick body to range percentage.
 // It's less important for the left formation to have a fat body.
@@ -57,5 +57,5 @@ if display_body_range_label and (engulfing_cond_dn or engulfing_cond_up)
                  yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
                  style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
 
-plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.blue, size = size.auto) // text = "Engulfing"
-plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.blue, size = size.auto) // text = "Engulfing"
+plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.new(color.blue, 50), size = size.auto) // text = "Engulfing"
+plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.new(color.blue, 50), size = size.auto) // text = "Engulfing"
