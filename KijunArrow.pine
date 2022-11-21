@@ -1,10 +1,10 @@
 //@version=5
-indicator('Kijun Arrow', overlay=true)
+indicator('Kijun Arrow', 'Kijun', overlay=true)
+display_ichimoku = input.bool(true, 'Display Ichimoku Cloud')
 conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
 basePeriodsK = input.int(26, minval=1, title='Kijun-Sen (Base Line) Periods')
 getMidPoint(__len, __offset) =>
     MidPointOffset = math.avg(ta.lowest(__len)[__offset], ta.highest(__len)[__offset])
-    MidPointOffset
 Kijun = getMidPoint(basePeriodsK, 0)
 //MODIFIED FROM OFFICIAL ICHIMOKU PINE SCRIPT
 senkou2Periods = input.int(52, minval=1, title='Senkou Span 2 Periods')
@@ -15,11 +15,11 @@ conversionLine = donchian(conversionPeriods)
 baseLine = donchian(basePeriodsK)
 leadLine1 = math.avg(conversionLine, baseLine)
 leadLine2 = donchian(senkou2Periods)
-plot(conversionLine, color=color.new(color.fuchsia, 0), linewidth=2, title='Tenkan-Sen (Conversion Line)')
-plot(baseLine, color=color.new(color.blue, 0), linewidth=4, title='Kijun-Sen (Base Line)')
-plot(close, offset=-_displacement, color=color.new(color.black, 80), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
-p1 = plot(leadLine1, offset=_displacement, color=color.new(color.green, 0), title='Senkou Span (Lead 1)')
-p2 = plot(leadLine2, offset=_displacement, color=color.new(color.red, 0), title='Senkou Span (Lead 2)')
+plot(display_ichimoku?conversionLine:na, color=color.new(color.fuchsia, 0), linewidth=2, title='Tenkan-Sen (Conversion Line)')
+plot(display_ichimoku?baseLine:na, color=color.new(color.blue, 0), linewidth=4, title='Kijun-Sen (Base Line)')
+plot(display_ichimoku?close:na, offset=-_displacement, color=color.new(color.black, 80), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
+p1 = plot(display_ichimoku?leadLine1:na, offset=_displacement, color=color.new(color.green, 0), title='Senkou Span (Lead 1)')
+p2 = plot(display_ichimoku?leadLine2:na, offset=_displacement, color=color.new(color.red, 0), title='Senkou Span (Lead 2)')
 fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
 //END OF OFFICIAL ICHIMOKU PINE SCRIPT
 int _curArrowDirection = if Kijun[0] - Kijun[1] > 0
@@ -31,17 +31,16 @@ int _newDirection = 0
 if _curArrowDirection != _existingArrowDirection
     _newDirection := _curArrowDirection
     _existingArrowDirection := _curArrowDirection
-    _existingArrowDirection
 
-bool _bChikouSpanLn    = close[0] > close[_displacement]
-bool _bChikouSpanSt   = close[0] < close[_displacement]
+bool _bChikouSpanLn = close[0] > close[_displacement]
+bool _bChikouSpanSt = close[0] < close[_displacement]
 
 // I'm using plotchar instead to place arrows above or below Kijunsen, which saves space for other signals
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
-plotchar(_newDirection==1?baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 50), size = size.small)
-plotchar(_newDirection==-1?baseLine:na, title='Kijun Arrow', char = "⬇ ", location = location.abovebar, color =color.new(color.black, 50), size = size.small)
-plot(_bChikouSpanLn and _newDirection==1 ?close:na, offset=-_displacement, color=color.new(color.orange, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
-plot(_bChikouSpanSt and _newDirection==-1 ?close:na, offset=-_displacement, color=color.new(color.purple, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
+plotchar(_newDirection==1   and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 0), size = size.small)
+plotchar(_newDirection==-1  and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬇", location = location.abovebar, color =color.new(color.black, 0), size = size.small)
+plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.orange, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.purple, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
 
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
@@ -69,10 +68,10 @@ plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = sh
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
 //---------------COPY OF HOLP--------------
-_bPivot = input.bool(true, 'Display Pivot Point')
-_bHOLPLOHP = input.bool(true, 'Display HOLP/LOHP signal')
-_p = input.int(title='Lookback Periods', defval=10, minval=2)
-_b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
+_bPivot     = input.bool(false, 'Display HOLP/LOHP Pivot Point')
+_bHOLPLOHP  = input.bool(false, 'Display HOLP/LOHP Signal')
+_p          = input.int(title='Lookback Periods', defval=10, minval=2)
+_b2bar      = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
 
 var _boolNewLow = 0
 _sessionLow = 0.0
@@ -110,10 +109,13 @@ if _conditionLOHP
     if _bPivot
         label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
-plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP',  style=shape.diamond, location=location.abovebar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP',  style=shape.diamond, location=location.belowbar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
 plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 
+// If ploting circles are confusing on the chart, use char instead
+// plotchar(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP', char = '⌉', location = location.abovebar, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+// plotchar(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP', char = '⌋', location = location.belowbar, color=color.new(color.maroon, 50), size=size.small, display=display.all)
 //---------------COPY OF HOLP--------------
 
