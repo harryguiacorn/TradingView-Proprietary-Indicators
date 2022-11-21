@@ -14,5 +14,5 @@ range_bar_1 = getRange(high[1], low[1])
 insbar_cond_up = low[2] < low[1] and high[2] > high[1] and close > open
 insbar_cond_dn = low[2] < low[1] and high[2] > high[1] and close < open
 
-plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.blue, size = size.auto) // text = ""
-plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.blue, size = size.auto) // text = ""
+plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.orange, size = size.auto) // text = ""
+plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.orange, size = size.auto) // text = ""
