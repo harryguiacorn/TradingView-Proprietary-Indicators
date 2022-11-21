@@ -53,9 +53,9 @@ if display_body_to_range_label and (engulfing_cond_dn or engulfing_cond_up)
 // Display engulfing body in points
 if display_body_range_label and (engulfing_cond_dn or engulfing_cond_up)
     label.new(bar_index, engulfing_cond_dn?high:low, 
-                 "body:" + str.tostring(getRange(open, close)) + "\natr:" + str.tostring(atr), 
+                 "body:" + str.tostring(getRange(open, close)) + "\natr:" + str.tostring(atr, format.mintick), 
                  yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
                  style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
 
-plotshape(con_dn, "Bearish Engulfing Circle", shape.circle, location.abovebar, color = color.blue, size = size.auto) // text = "Engulfing"
-plotshape(con_up, "Bullish Engulfing Circle", shape.circle, location.belowbar, color = color.blue, size = size.auto) // text = "Engulfing"
+plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.blue, size = size.auto) // text = "Engulfing"
+plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.blue, size = size.auto) // text = "Engulfing"
