@@ -17,7 +17,7 @@ leadLine1 = math.avg(conversionLine, baseLine)
 leadLine2 = donchian(senkou2Periods)
 plot(conversionLine, color=color.new(color.fuchsia, 0), linewidth=2, title='Tenkan-Sen (Conversion Line)')
 plot(baseLine, color=color.new(color.blue, 0), linewidth=4, title='Kijun-Sen (Base Line)')
-plot(close, offset=-_displacement, color=color.new(color.black, 50), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
+plot(close, offset=-_displacement, color=color.new(color.black, 80), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3)
 p1 = plot(leadLine1, offset=_displacement, color=color.new(color.green, 0), title='Senkou Span (Lead 1)')
 p2 = plot(leadLine2, offset=_displacement, color=color.new(color.red, 0), title='Senkou Span (Lead 2)')
 fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
@@ -36,7 +36,10 @@ if _curArrowDirection != _existingArrowDirection
 bool _bChikouSpanLn    = close[0] > close[_displacement]
 bool _bChikouSpanSt   = close[0] < close[_displacement]
 
-plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 0), colordown=color.new(color.black, 0), minheight=15, maxheight=15)
+// I'm using plotchar instead to place arrows above or below Kijunsen, which saves space for other signals
+// plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
+plotchar(_newDirection==1?baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 50), size = size.small)
+plotchar(_newDirection==-1?baseLine:na, title='Kijun Arrow', char = "⬇ ", location = location.abovebar, color =color.new(color.black, 50), size = size.small)
 plot(_bChikouSpanLn and _newDirection==1 ?close:na, offset=-_displacement, color=color.new(color.orange, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
 plot(_bChikouSpanSt and _newDirection==-1 ?close:na, offset=-_displacement, color=color.new(color.purple, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
 
@@ -107,8 +110,8 @@ if _conditionLOHP
     if _bPivot
         label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
-plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
 plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 
