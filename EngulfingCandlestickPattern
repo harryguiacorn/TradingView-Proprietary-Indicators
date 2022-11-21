@@ -22,20 +22,20 @@ getRange(x, y) => math.abs(x - y)
 
 atr = ta.atr(14)
 
-engulfing_cond_dn = open >= close[1] and 
-                     close <= open[1] and 
+engulfing_cond_dn = open >= math.max(close[1],open[1])  and 
+                     close <= math.min(close[1],open[1]) and 
                      open > close and 
-                     open[1] < close[1] and 
+                    //  open[1] < close[1] and 
                      getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> min_body_to_range_pct_lt and
                      getRange(open, close)/getRange(high, low) * 100> min_body_to_range_pct_rt
 con_dn = engulfing_cond_dn
 if filter_by_atr and engulfing_cond_dn
     con_dn := getRange(open, close)>atr?true:false
 
-engulfing_cond_up = open <= close[1] and 
-                     close >= open[1] and 
+engulfing_cond_up = open <= math.min(close[1],open[1]) and 
+                     close >= math.max(close[1],open[1]) and 
                      open < close and 
-                     open[1] > close[1] and
+                    //  open[1] > close[1] and
                      getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> min_body_to_range_pct_lt and
                      getRange(open, close)/getRange(high, low) * 100> min_body_to_range_pct_rt
 
