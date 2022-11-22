@@ -109,8 +109,8 @@ if _conditionLOHP
     if _bPivot
         label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP',  style=shape.diamond, location=location.abovebar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
-plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP',  style=shape.diamond, location=location.belowbar, offset=0, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP',  style=shape.diamond, location=location.abovebar, offset=0, color=color.new(color.yellow, 50), size=size.small, display=display.all)
+plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP',  style=shape.diamond, location=location.belowbar, offset=0, color=color.new(color.yellow, 50), size=size.small, display=display.all)
 plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 
