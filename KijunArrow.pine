@@ -39,8 +39,8 @@ bool _bChikouSpanSt = close[0] < close[_displacement]
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
 plotchar(_newDirection==1   and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 0), size = size.small)
 plotchar(_newDirection==-1  and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬇", location = location.abovebar, color =color.new(color.black, 0), size = size.small)
-plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.orange, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
-plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.purple, 0), title='Chikou Span Below', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
+plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_circles, linewidth=8)
 
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
@@ -98,7 +98,7 @@ if high[0] > ta.highest(_p)[1]
     _sessionHigh := high
     _boolNewHigh := 1
 _arrowLOHP = 0.0
-_conditionLOHP = if _b2bar
+bool _conditionLOHP = if _b2bar
     _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < low[lastHiBar + 1] 
 else 
     _boolNewHigh == 1 and close[0] < low[lastHiBar]
