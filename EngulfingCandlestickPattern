@@ -18,6 +18,8 @@ filter_by_atr = input.bool(false, "Only display superior engulfing signals", "On
 display_body_to_range_label = input.bool(false, "Display body to price range percentage")
 display_body_range_label = input.bool(false, "Display body of price range")
 
+setting_engulfing_bar_close_beyond_prev_max = input.bool(false, "Engulfing Candle Closes Above/Below Prior Bar's High/Low")
+
 getRange(x, y) => math.abs(x - y)
 
 atr = ta.atr(14)
@@ -25,23 +27,32 @@ atr = ta.atr(14)
 engulfing_cond_dn = open >= math.max(close[1],open[1])  and 
                      close <= math.min(close[1],open[1]) and 
                      open > close and 
-                    //  open[1] < close[1] and 
                      getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> min_body_to_range_pct_lt and
                      getRange(open, close)/getRange(high, low) * 100> min_body_to_range_pct_rt
 con_dn = engulfing_cond_dn
 if filter_by_atr and engulfing_cond_dn
     con_dn := getRange(open, close)>atr?true:false
+engulfing_bar_close_below_prev_max = close < low[1]
+if setting_engulfing_bar_close_beyond_prev_max and engulfing_cond_dn
+    con_dn := engulfing_bar_close_below_prev_max ? true:false
+if setting_engulfing_bar_close_beyond_prev_max and engulfing_cond_dn and filter_by_atr
+    con_dn := engulfing_bar_close_below_prev_max ? true:false
 
 engulfing_cond_up = open <= math.min(close[1],open[1]) and 
                      close >= math.max(close[1],open[1]) and 
                      open < close and 
-                    //  open[1] > close[1] and
                      getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> min_body_to_range_pct_lt and
                      getRange(open, close)/getRange(high, low) * 100> min_body_to_range_pct_rt
 
 con_up = engulfing_cond_up
 if filter_by_atr and engulfing_cond_up
     con_up := getRange(open, close)>atr?true:false
+engulfing_bar_close_above_prev_max = close > high[1]
+if setting_engulfing_bar_close_beyond_prev_max and engulfing_cond_up
+    con_up := engulfing_bar_close_above_prev_max ? true:false
+if setting_engulfing_bar_close_beyond_prev_max and engulfing_cond_up and filter_by_atr
+    con_up := engulfing_bar_close_above_prev_max ? true:false
+
 
 // Display engulfing body percentage in comparison with its range (high and low)
 if display_body_to_range_label and (engulfing_cond_dn or engulfing_cond_up)
