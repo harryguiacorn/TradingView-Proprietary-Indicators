@@ -98,7 +98,7 @@ plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, 
 // ------------------------------------END OF COPY OF Inside Bar Candlestick Pattern ------------------------------------
 
 // ------------------------------------COPY OF HOLP/LOHP Candlestick Pattern ------------------------------------
-bool enableHOLPLOHP = input.bool(true, 'Enable HOLP/LOHP signal')
+bool enableHOLPLOHP = input.bool(true, '3. Enable HOLP/LOHP signal')
 bool _bPivot = input.bool(false, 'Enable Pivot Point')
 _p = input.int(title='Lookback Periods', defval=10, minval=2)
 _b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
