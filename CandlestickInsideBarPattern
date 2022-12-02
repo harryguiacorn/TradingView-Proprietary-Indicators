@@ -5,7 +5,7 @@
 // This is a 3-bar formation setup
 // The range of -1 bar is capped within the -2 bar's
 // The direction of current bar dictates the direction of the signal
-indicator(title="Inside Bar Candlestick Pattern", shorttitle="Inside Bar", overlay=true, precision = 0)
+indicator(title="Candlestick - Inside Bar Pattern", shorttitle="Inside Bar", overlay=true, precision = 0)
 
 getRange(x, y) => math.abs(x - y)
 
