@@ -5,6 +5,8 @@
 indicator(title="Candlestick Patterns", shorttitle="Candlestick", overlay=true, precision = 0)
 
 // ------------------------------------ COPY OF Engulfing Candlestick Pattern ------------------------------------
+// indicator(title="Candlestick Pattern - Engulfing", shorttitle="Engulfing", overlay=true, precision = 0)
+bool enableEngulfing = input.bool(true, '1. Enable Engulfing signal')
 
 // Options for setting the minimum requirement of candlestick body to range percentage.
 // It's less important for the left formation to have a fat body.
@@ -69,11 +71,10 @@ if display_body_range_label and (engulfing_cond_dn or engulfing_cond_up)
                  yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
                  style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
 
-plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.new(color.blue, 50), size = size.auto) // text = "Engulfing"
-plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.new(color.blue, 50), size = size.auto) // text = "Engulfing"
+plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.new(color.blue, 50), size = size.auto, display = enableEngulfing?display.all:display.data_window)
+plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.new(color.blue, 50), size = size.auto, display = enableEngulfing?display.all:display.data_window)
 
 // ------------------------------------ END OF COPY OF Engulfing Candlestick Pattern ------------------------------------
-
 
 // ------------------------------------ COPY OF Inside Bar Candlestick Pattern ------------------------------------
 // This is a 3-bar formation setup
@@ -82,13 +83,98 @@ plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, c
 // indicator(title="Inside Bar Candlestick Pattern", shorttitle="Inside Bar", overlay=true, precision = 0)
 
 // getRange(x, y) => math.abs(x - y)
+
+bool enableInsideBar = input.bool(true, '2. Enable Inside Bar signal')
+
 range_bar_2 = getRange(high[2], low[2])
 range_bar_1 = getRange(high[1], low[1])
 
 bool insbar_cond_up = low[2] < low[1] and high[2] > high[1] and close > open
 bool insbar_cond_dn = low[2] < low[1] and high[2] > high[1] and close < open
 
-plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.new(color.black, 50), size = size.auto) // text = ""
-plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.new(color.black, 50), size = size.auto) // text = ""
+plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.new(color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
+plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.new(color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
 
 // ------------------------------------END OF COPY OF Inside Bar Candlestick Pattern ------------------------------------
+
+// ------------------------------------COPY OF HOLP/LOHP Candlestick Pattern ------------------------------------
+bool enableHOLPLOHP = input.bool(true, '3. Enable HOLP/LOHP signal')
+bool _bPivot = input.bool(false, 'Enable Pivot Point')
+_p = input.int(title='Lookback Periods', defval=10, minval=2)
+_b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
+
+var _boolNewLow = 0
+_sessionLow = 0.0
+lastLoBar = -ta.lowestbars(low, _p + 1)
+if low[0] < ta.lowest(_p)[1]
+    _sessionLow := low
+    _boolNewLow := 1
+_arrowHOLP = 0.0
+_conditionHOLP = if _b2bar
+    _boolNewLow == 1 and close[0] > high[lastLoBar] and close[0] > high[lastLoBar + 1] // The HOLP needs to close above the highs of session low bar and its prior bar, hence it's name
+else 
+    _boolNewLow == 1 and close[0] > high[lastLoBar] // The HOLP needs to close above the highs of session low bar
+
+if _conditionHOLP
+    _arrowHOLP := close
+    _boolNewLow := 0
+    if _bPivot
+        label.new(bar_index[lastLoBar], na, "▲\n" + str.tostring(low[lastLoBar], format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+var _boolNewHigh = 0
+_sessionHigh = 0.0
+lastHiBar = -ta.highestbars(high, _p + 1)
+if high[0] > ta.highest(_p)[1]
+    _sessionHigh := high
+    _boolNewHigh := 1
+_arrowLOHP = 0.0
+_conditionLOHP = if _b2bar
+    _boolNewHigh == 1 and close[0] < low[lastHiBar] and close[0] < low[lastHiBar + 1] 
+else 
+    _boolNewHigh == 1 and close[0] < low[lastHiBar]
+
+if _conditionLOHP
+    _arrowLOHP := close
+    _boolNewHigh := 0
+    if _bPivot
+        label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+plotshape(enableHOLPLOHP?_conditionLOHP:na,   title = 'LOHP',  style=shape.diamond, location=location.abovebar, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableHOLPLOHP?display.all:display.data_window)
+plotshape(enableHOLPLOHP?_conditionHOLP:na,   title = 'HOLP',  style=shape.diamond, location=location.belowbar, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableHOLPLOHP?display.all:display.data_window)
+plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+
+// If ploting circles are confusing on the chart, use char instead
+// plotchar(enableHOLPLOHP?_conditionLOHP:na,   title = 'LOHP', char = '⌉', location = location.abovebar, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+// plotchar(enableHOLPLOHP?_conditionHOLP:na,   title = 'HOLP', char = '⌋', location = location.belowbar, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+
+// ------------------------------------ END OF COPY OF HOLP/LOHP Candlestick Pattern ------------------------------------
+
+
+//---------------------- COPY OF Candlestick Kicker --------------------------
+
+bool enableKicker = input.bool(true, '4. Enable Candlestick Kicker Pattern')
+_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation')
+_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation')
+
+// getRange(x, y) => math.abs(x - y)
+
+condition_kicker_up_threshold = open[1] > close[1] and 
+                                 open < close and 
+                                 open > open[1] and 
+                                 low > low[1] and
+                                 getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> _bodyPencLeft and
+                                 getRange(open, close)/getRange(high, low) * 100> _bodyPencRight
+condition_kicker_dn_threshold = open[1] < close[1] and 
+                                 open > close and 
+                                 open < open[1] and 
+                                 high < high[1] and
+                                 getRange(open[1], close[1])/getRange(high[1], low[1]) * 100> _bodyPencLeft and
+                                 getRange(open, close)/getRange(high, low) * 100> _bodyPencRight
+plotshape(condition_kicker_up_threshold?close:na, 'kicker upwards', style = shape.circle, location = location.belowbar, size = size.auto, color = color.green, display = enableKicker?display.all:display.data_window)
+plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = shape.circle, location = location.abovebar, size = size.auto, color = color.red, display = enableKicker?display.all:display.data_window)
+
+//---------------------- END OF COPY OF Candlestick Kicker --------------------------
+
+
+
