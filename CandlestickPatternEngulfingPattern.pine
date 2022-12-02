@@ -2,7 +2,8 @@
 // © FxCloudTrader
 
 //@version=5
-indicator(title="Engulfing Candlestick Pattern", shorttitle="Engulfing", overlay=true, precision = 0)
+indicator(title="Candlestick Pattern - Engulfing", shorttitle="Engulfing", overlay=true, precision = 0)
+bool enableEngulfing = input.bool(true, '1. Enable Engulfing signal')
 
 // Options for setting the minimum requirement of candlestick body to range percentage.
 // It's less important for the left formation to have a fat body.
@@ -18,7 +19,7 @@ filter_by_atr = input.bool(false, "Only display superior engulfing signals", "On
 display_body_to_range_label = input.bool(false, "Display body to price range percentage")
 display_body_range_label = input.bool(false, "Display body of price range")
 
-setting_engulfing_bar_close_beyond_prev_max = input.bool(false, "Engulfing Candle Closes Above/Below Prior Bar's High/Low")
+setting_engulfing_bar_close_beyond_prev_max = input.bool(true, "Engulfing Candle Closes Above/Below Prior Bar's High/Low")
 
 getRange(x, y) => math.abs(x - y)
 
@@ -53,7 +54,6 @@ if setting_engulfing_bar_close_beyond_prev_max and engulfing_cond_up
 if setting_engulfing_bar_close_beyond_prev_max and engulfing_cond_up and filter_by_atr
     con_up := engulfing_bar_close_above_prev_max ? true:false
 
-
 // Display engulfing body percentage in comparison with its range (high and low)
 if display_body_to_range_label and (engulfing_cond_dn or engulfing_cond_up)
     label.new(bar_index, engulfing_cond_dn?high:low, 
@@ -68,5 +68,5 @@ if display_body_range_label and (engulfing_cond_dn or engulfing_cond_up)
                  yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
                  style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
 
-plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.new(color.blue, 50), size = size.auto) // text = "Engulfing"
-plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.new(color.blue, 50), size = size.auto) // text = "Engulfing"
+plotshape(con_dn, "Bearish Engulfing Circle", shape.square, location.abovebar, color = color.new(color.blue, 50), size = size.auto, display = enableEngulfing?display.all:display.data_window)
+plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, color = color.new(color.blue, 50), size = size.auto, display = enableEngulfing?display.all:display.data_window)
