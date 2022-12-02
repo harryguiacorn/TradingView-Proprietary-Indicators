@@ -1,5 +1,5 @@
 //@version=5
-indicator('HOLP-LOHP', shorttitle='HOLP-LOHP', format=format.price, precision=0, overlay=true)
+indicator('Candlestick Patterns - HOLP-LOHP', shorttitle='HOLP-LOHP', format=format.price, precision=0, overlay=true)
 bool enableHOLPLOHP = input.bool(true, 'Enable HOLP/LOHP signal')
 bool _bPivot = input.bool(false, 'Enable Pivot Point')
 _p = input.int(title='Lookback Periods', defval=10, minval=2)
