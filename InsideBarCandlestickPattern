@@ -8,11 +8,14 @@
 indicator(title="Inside Bar Candlestick Pattern", shorttitle="Inside Bar", overlay=true, precision = 0)
 
 getRange(x, y) => math.abs(x - y)
+
+bool enableInsideBar = input.bool(true, '2. Enable Inside Bar signal')
+
 range_bar_2 = getRange(high[2], low[2])
 range_bar_1 = getRange(high[1], low[1])
 
 bool insbar_cond_up = low[2] < low[1] and high[2] > high[1] and close > open
 bool insbar_cond_dn = low[2] < low[1] and high[2] > high[1] and close < open
 
-plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.new(color.black, 50), size = size.auto) // text = ""
-plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.new(color.black, 50), size = size.auto) // text = ""
+plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.new(color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
+plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.new(color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
