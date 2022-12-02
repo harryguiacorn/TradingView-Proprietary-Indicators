@@ -1,9 +1,10 @@
 //@version=5
 indicator('HOLP-LOHP', shorttitle='HOLP-LOHP', format=format.price, precision=0, overlay=true)
-_bPivot = input.bool(true, 'Display Pivot Point')
-_bHOLPLOHP = input.bool(true, 'Display HOLP/LOHP signal')
+bool enableHOLPLOHP = input.bool(true, 'Enable HOLP/LOHP signal')
+bool _bPivot = input.bool(false, 'Enable Pivot Point')
 _p = input.int(title='Lookback Periods', defval=10, minval=2)
 _b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
+
 
 var _boolNewLow = 0
 _sessionLow = 0.0
@@ -41,7 +42,11 @@ if _conditionLOHP
     if _bPivot
         label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-plotshape(_bHOLPLOHP?_conditionLOHP:na,   title = 'LOHP Circle',  style=shape.circle, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
-plotshape(_bHOLPLOHP?_conditionHOLP:na,   title = 'HOLP Circle',  style=shape.circle, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.all)
+plotshape(enableHOLPLOHP?_conditionLOHP:na,   title = 'LOHP',  style=shape.diamond, location=location.abovebar, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableHOLPLOHP?display.all:display.data_window)
+plotshape(enableHOLPLOHP?_conditionHOLP:na,   title = 'HOLP',  style=shape.diamond, location=location.belowbar, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableHOLPLOHP?display.all:display.data_window)
 plotshape(_sessionLow,  title = 'Session Low',  style=shape.xcross, location=location.belowbar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
 plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=location.abovebar, offset=0, color=color.new(color.maroon, 0), size=size.small, display=display.none)
+
+// If ploting circles are confusing on the chart, use char instead
+// plotchar(enableHOLPLOHP?_conditionLOHP:na,   title = 'LOHP', char = '⌉', location = location.abovebar, color=color.new(color.maroon, 50), size=size.small, display=display.all)
+// plotchar(enableHOLPLOHP?_conditionHOLP:na,   title = 'HOLP', char = '⌋', location = location.belowbar, color=color.new(color.maroon, 50), size=size.small, display=display.all)
