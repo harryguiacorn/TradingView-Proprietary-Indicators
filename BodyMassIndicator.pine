@@ -1,0 +1,28 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+
+//@version=5
+indicator("Body Mass Indicator", "BMI", overlay = true)
+enableBodyMass = input.bool(true, "Enable Body Mass Indicator")
+lookbackperiod = input.int(26, "Look back periods")
+
+BodyRange() =>
+	math.abs(close - open)
+
+// Get the highest body range of the past number of bars
+highestBodyRange = ta.highest(BodyRange(), lookbackperiod)
+
+// atr = ta.atr(lookbackperiod)
+// noOfAtr = 1
+
+if highestBodyRange==BodyRange() and enableBodyMass// and BodyRange() > atr * noOfAtr
+	if close > open
+    	label.new(bar_index[0], na, "▲\n" + str.tostring(highestBodyRange, format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+	else if close < open
+		label.new(bar_index[0], na, str.tostring(highestBodyRange, format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+//Display every candlestick range for testing environment
+// label.new(bar_index[0], na, str.tostring(BodyRange(), format.mintick) + "", yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+
+// plotshape(highestBodyRange==BodyRange()?highestBodyRange:na,   title = 'Body Mass',  style=shape.flag, location=location.bottom, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableBodyMass?display.all:display.data_window)
+
