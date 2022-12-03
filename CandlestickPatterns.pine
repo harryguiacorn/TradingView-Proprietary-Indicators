@@ -175,5 +175,20 @@ plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = sh
 
 //---------------------- END OF COPY OF Candlestick Kicker --------------------------
 
+//---------------------- COPY OF Body Mass Indicator --------------------------
+// indicator("Body Mass Indicator", "BMI", overlay = true)
+enableBodyMass = input.bool(true, "5. Enable Body Mass Indicator")
+lookbackperiod = input.int(26, "Look back periods")
 
+BodyRange() =>
+	math.abs(close - open)
 
+// Get the highest body range of the past number of bars
+highestBodyRange = ta.highest(BodyRange(), lookbackperiod)
+
+if highestBodyRange==BodyRange() and enableBodyMass// and BodyRange() > atr * noOfAtr
+	if close > open
+    	label.new(bar_index[0], na, "▲\n" + str.tostring(highestBodyRange, format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+	else if close < open
+		label.new(bar_index[0], na, str.tostring(highestBodyRange, format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+//---------------------- END OF COPY OF Body Mass Indicator --------------------------
