@@ -10,12 +10,21 @@ indicator(title="Candlestick - Inside Bar Pattern", shorttitle="Inside Bar", ove
 getRange(x, y) => math.abs(x - y)
 
 bool enableInsideBar = input.bool(true, '2. Enable Inside Bar signal')
+int minimumCloseTriggerCandle = input.int(50, "Minimum Pencentage of Close of Price Candle Range", step = 5)// The default is 50%, meaning the closing price needs to be above 50% of its price range for a bullish candle
 
 range_bar_2 = getRange(high[2], low[2])
 range_bar_1 = getRange(high[1], low[1])
 
-bool insbar_cond_up = low[2] < low[1] and high[2] > high[1] and close > open
-bool insbar_cond_dn = low[2] < low[1] and high[2] > high[1] and close < open
+bool insbar_cond_up = low[2] < low[1] and high[2] > high[1] and close > open //and close >= hl2
+bool insbar_cond_dn = low[2] < low[1] and high[2] > high[1] and close < open //and close <= hl2
 
-plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.new(color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
-plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.new(color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
+bool weakUp = close < hl2
+bool weakDn = close > hl2
+
+// if insbar_cond_up and weakUp
+//     label.new(bar_index, na, "Weak", yloc = yloc.belowbar, style = label.style_none, textcolor = color.red, size = size.normal)
+// if insbar_cond_dn and weakDn
+//     label.new(bar_index, na, "Weak", yloc = yloc.abovebar, style = label.style_none, textcolor = color.red, size = size.normal)
+
+plotshape(insbar_cond_up, "Inside Bar Bullish", shape.cross, location.belowbar, color = color.new(weakUp?color.yellow:color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
+plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, color = color.new(weakDn?color.yellow:color.black, 50), size = size.auto, display = enableInsideBar?display.all:display.data_window)
