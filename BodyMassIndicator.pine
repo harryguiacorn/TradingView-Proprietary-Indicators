@@ -9,13 +9,10 @@ lookbackperiod = input.int(26, "Look back periods")
 noOfAtr = input.int(1, "Number of ATRs vs body mass")
 
 BodyRange() =>
-	math.abs(close - open)
+	math.abs(close - open) 
 
 // Get the highest body range of the past number of bars
 highestBodyRange = ta.highest(BodyRange(), lookbackperiod)
-
-atr = ta.atr(lookbackperiod)
-
 
 if highestBodyRange==BodyRange() and enableBodyMass
 	if close > open
@@ -23,7 +20,7 @@ if highestBodyRange==BodyRange() and enableBodyMass
 	else if close < open
 		label.new(bar_index, na, str.tostring(highestBodyRange, format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-if BodyRange()> atr * noOfAtr and enableBodyATRMass
+if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 	if close > open
     	label.new(bar_index, na, "▲\n" + str.tostring(BodyRange(), format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
 	else if close < open
@@ -33,4 +30,3 @@ if BodyRange()> atr * noOfAtr and enableBodyATRMass
 // label.new(bar_index[0], na, str.tostring(BodyRange(), format.mintick) + "", yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
 
 // plotshape(highestBodyRange==BodyRange()?highestBodyRange:na,   title = 'Body Mass',  style=shape.flag, location=location.bottom, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableBodyMass?display.all:display.data_window)
-
