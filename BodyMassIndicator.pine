@@ -3,8 +3,8 @@
 
 //@version=5
 indicator("Body Mass Indicator", "BMI", overlay = true)
-enableBodyMass      = input.bool(true, "Enable Body Mass Indicator")
-enableBodyATRMass   = input.bool(false, "Enable Body Mass ATR Indicator")
+enableBodyMass      = input.bool(true, "5.1 Enable Body Mass Indicator")
+enableBodyATRMass   = input.bool(false, "5.2 Enable Body Mass ATR Indicator")
 lookbackperiod = input.int(26, "Look back periods")
 noOfAtr = input.int(1, "Number of ATRs vs body mass")
 
