@@ -219,9 +219,9 @@ if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
 bool enableHHLL = input.bool(true, "6 Enable HH/LL Indicator")
-// 3-bar formation, bar 0 close needs to be lower than bar 2 close, bar 1 needs to be a bearish bar
-hhll_cond_dn = high[0] < high[1] and low[0] < low[1] and high[1] < high[2] and low[1] < low[2] and close[0] < close[2] and close[1] < open[1]
-hhll_cond_up = high[0] > high[1] and low[0] > low[1] and high[1] > high[2] and low[1] > low[2] and close[0] > close[2] and close[1] > open[1]
+// 3-bar formation, bar 0 close needs to be lower than bar 2 close
+hhll_cond_dn = high[0] < high[1] and low[0] < low[1] and high[1] < high[2] and low[1] < low[2] and close[0] < close[2] //and close[1] < open[1]
+hhll_cond_up = high[0] > high[1] and low[0] > low[1] and high[1] > high[2] and low[1] > low[2] and close[0] > close[2] //and close[1] > open[1]
 plotshape(hhll_cond_up?close:na, 'upwards',     style = shape.arrowup,      location = location.belowbar, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
 plotshape(hhll_cond_dn?close:na, 'downwards',   style = shape.arrowdown,    location = location.abovebar, size = size.auto, color = color.new(color.red, 50),   display = enableHHLL?display.all:display.data_window)
 
