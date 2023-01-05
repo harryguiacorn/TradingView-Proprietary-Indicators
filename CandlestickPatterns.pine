@@ -6,7 +6,7 @@ indicator(title="Candlestick Patterns", shorttitle="Candlestick", overlay=true, 
 
 // ------------------------------------ COPY OF Engulfing Candlestick Pattern ------------------------------------
 // indicator(title="Candlestick Pattern - Engulfing", shorttitle="Engulfing", overlay=true, precision = 0)
-bool enableEngulfing = input.bool(true, '1. Enable Engulfing signal')
+bool enableEngulfing = input.bool(true, '1. Enable Engulfing signal') // true
 
 // Options for setting the minimum requirement of candlestick body to range percentage.
 // It's less important for the left formation to have a fat body.
@@ -84,7 +84,7 @@ plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, c
 
 // getRange(x, y) => math.abs(x - y)
 
-bool enableInsideBar = input.bool(true, '2. Enable Inside Bar signal')
+bool enableInsideBar = input.bool(true, '2. Enable Inside Bar signal') // true
 int minimumCloseTriggerCandle = input.int(50, "Minimum Pencentage of Close of Price Candle Range", step = 5)// The default is 50%, meaning the closing price needs to be above 50% of its price range for a bullish candle
 
 range_bar_2 = getRange(high[2], low[2])
@@ -107,7 +107,7 @@ plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, 
 // ------------------------------------END OF COPY OF Inside Bar Candlestick Pattern ------------------------------------
 
 // ------------------------------------COPY OF HOLP/LOHP Candlestick Pattern ------------------------------------
-bool enableHOLPLOHP = input.bool(true, '3. Enable HOLP/LOHP signal')
+bool enableHOLPLOHP = input.bool(true, '3. Enable HOLP/LOHP signal') // true
 bool _bPivot = input.bool(false, 'Enable Pivot Point')
 _p = input.int(title='Lookback Periods', defval=10, minval=2)
 _b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
@@ -161,7 +161,7 @@ plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=loc
 
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
-bool enableKicker = input.bool(true, '4. Enable Candlestick Kicker Pattern')
+bool enableKicker = input.bool(true, '4. Enable Candlestick Kicker Pattern') //true
 _bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation')
 _bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation')
 
@@ -186,7 +186,7 @@ plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = sh
 
 //---------------------- COPY OF Body Mass Indicator --------------------------
 // indicator("Body Mass Indicator", "BMI", overlay = true)
-enableBodyMass      = input.bool(true, "5.1 Enable Body Mass Indicator")
+enableBodyMass      = input.bool(true, "5.1 Enable Body Mass Indicator") // true
 enableBodyATRMass   = input.bool(false, "5.2 Enable Body Mass ATR Indicator")
 lookbackperiod = input.int(26, "Look back periods")
 noOfAtr = input.int(1, "Number of ATRs vs body mass")
@@ -216,3 +216,13 @@ if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 
 
 //---------------------- END OF COPY OF Body Mass Indicator --------------------------
+
+//---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
+bool enableHHLL = input.bool(true, "6 Enable HH/LL Indicator")
+// 3-bar formation, bar 0 close needs to be lower than bar 2 close, bar 1 needs to be a bearish bar
+hhll_cond_dn = high[0] < high[1] and low[0] < low[1] and high[1] < high[2] and low[1] < low[2] and close[0] < close[2] and close[1] < open[1]
+hhll_cond_up = high[0] > high[1] and low[0] > low[1] and high[1] > high[2] and low[1] > low[2] and close[0] > close[2] and close[1] > open[1]
+plotshape(hhll_cond_up?close:na, 'upwards',     style = shape.arrowup,      location = location.belowbar, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
+plotshape(hhll_cond_dn?close:na, 'downwards',   style = shape.arrowdown,    location = location.abovebar, size = size.auto, color = color.new(color.red, 50),   display = enableHHLL?display.all:display.data_window)
+
+//---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
