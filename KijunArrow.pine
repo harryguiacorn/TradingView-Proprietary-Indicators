@@ -38,7 +38,7 @@ bool _bChikouSpanSt = close[0] < close[_displacement]
 
 // I'm using plotchar instead to place arrows above or below Kijunsen, which saves space for other signals
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
-plotchar(_newDirection==1   and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 0), size = size.small)
-plotchar(_newDirection==-1  and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬇", location = location.abovebar, color =color.new(color.black, 0), size = size.small)
+plotchar(_newDirection==1   and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 0), size = size.auto)
+plotchar(_newDirection==-1  and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬇", location = location.abovebar, color =color.new(color.black, 0), size = size.auto)
 plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_circles, linewidth=8)
 plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_circles, linewidth=8)
