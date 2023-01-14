@@ -84,7 +84,7 @@ plotshape(con_up, "Bullish Engulfing Circle", shape.square, location.belowbar, c
 
 // getRange(x, y) => math.abs(x - y)
 
-bool enableInsideBar = input.bool(true, '2. Enable Inside Bar signal') // true
+bool enableInsideBar = input.bool(false, '2. Enable Inside Bar signal') // true
 int minimumCloseTriggerCandle = input.int(50, "Minimum Pencentage of Close of Price Candle Range", step = 5)// The default is 50%, meaning the closing price needs to be above 50% of its price range for a bullish candle
 
 range_bar_2 = getRange(high[2], low[2])
@@ -199,15 +199,15 @@ highestBodyRange = ta.highest(BodyRange(), lookbackperiod)
 
 if highestBodyRange==BodyRange() and enableBodyMass
 	if close > open
-    	label.new(bar_index, na, "▲\n" + str.tostring(highestBodyRange, format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+    	label.new(bar_index, na, "▲\n" + str.tostring(highestBodyRange, format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.new(color.black, 20), size = size.normal)
 	else if close < open
-		label.new(bar_index, na, str.tostring(highestBodyRange, format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+		label.new(bar_index, na, str.tostring(highestBodyRange, format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.new(color.black, 20), size = size.normal)
 
 if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 	if close > open
-    	label.new(bar_index, na, "▲\n" + str.tostring(BodyRange(), format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
+    	label.new(bar_index, na, "▲\n" + str.tostring(BodyRange(), format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.new(color.black, 50), size = size.normal)
 	else if close < open
-		label.new(bar_index, na, str.tostring(BodyRange(), format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
+		label.new(bar_index, na, str.tostring(BodyRange(), format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.new(color.black, 50), size = size.normal)
 
 //Display every candlestick range for testing environment
 // label.new(bar_index[0], na, str.tostring(BodyRange(), format.mintick) + "", yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
