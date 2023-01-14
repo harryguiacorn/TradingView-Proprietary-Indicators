@@ -19,9 +19,9 @@ leadLine2 = donchian(senkou2Periods)
 plot(display_ichimoku?conversionLine:na, color=color.new(color.fuchsia, 0), linewidth=2, title='Tenkan-Sen (Conversion Line)')
 plot(display_ichimoku?baseLine:na, color=color.new(color.blue, 0), linewidth=4, title='Kijun-Sen (Base Line)')
 plot(display_ichimoku?close:na, offset=-_displacement, color=color.new(color.black, 80), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3, display = display_chikou_span? display.all: display.none)
-p1 = plot(display_ichimoku?leadLine1:na, offset=_displacement, color=color.new(color.green, 0), title='Senkou Span (Lead 1)')
-p2 = plot(display_ichimoku?leadLine2:na, offset=_displacement, color=color.new(color.red, 0), title='Senkou Span (Lead 2)')
-fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
+p1 = plot(display_ichimoku?leadLine1:na, offset=_displacement, color=color.new(color.green, 50), title='Senkou Span (Lead 1)')
+p2 = plot(display_ichimoku?leadLine2:na, offset=_displacement, color=color.new(color.red, 50), title='Senkou Span (Lead 2)')
+fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 95) : color.new(color.red, 95))
 //END OF OFFICIAL ICHIMOKU PINE SCRIPT
 int _curArrowDirection = if Kijun[0] - Kijun[1] > 0
     1
