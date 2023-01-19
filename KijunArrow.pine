@@ -36,9 +36,25 @@ if _curArrowDirection != _existingArrowDirection
 bool _bChikouSpanLn = close[0] > close[_displacement]
 bool _bChikouSpanSt = close[0] < close[_displacement]
 
+atr = ta.atr(14)
+offset_atr_arrow = 1.4
+
+setLocationByATR(con_dn, con_up, offset) =>
+    float con_dn_loc1 = na
+    if con_dn
+        con_dn_loc1 := high + offset * atr
+    float con_up_loc1 = na
+    if con_up
+        con_up_loc1 := low - offset * atr
+    [con_dn_loc1, con_up_loc1]
+
+cond_dn_arrow = _newDirection==-1
+cond_up_arrow = _newDirection==1
+[con_dn_arrow_loc, con_up_arrow_loc] = setLocationByATR(cond_dn_arrow, cond_up_arrow, offset_atr_arrow)
+
 // I'm using plotchar instead to place arrows above or below Kijunsen, which saves space for other signals
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
-plotchar(_newDirection==1   and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬆", location = location.belowbar, color =color.new(color.black, 0), size = size.auto)
-plotchar(_newDirection==-1  and display_ichimoku ? baseLine:na, title='Kijun Arrow', char = "⬇", location = location.abovebar, color =color.new(color.black, 0), size = size.auto)
+plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
+plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
 plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8)
 plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8)
