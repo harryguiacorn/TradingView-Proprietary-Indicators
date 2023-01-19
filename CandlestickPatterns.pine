@@ -5,6 +5,10 @@
 indicator(title="Candlestick Patterns", shorttitle="Candlestick", overlay=true, precision = 0)
 
 atr = ta.atr(14)
+offset_atr_hhll = 0.5
+offset_atr_engulfing = 0.8
+offset_atr_HOLPLOHP = 1.1
+
 
 setLocationByATR(con_dn, con_up, offset) =>
     float con_dn_loc1 = na
@@ -80,7 +84,7 @@ if display_body_range_label and (engulfing_cond_dn or engulfing_cond_up)
                  yloc = engulfing_cond_dn?yloc.abovebar:yloc.belowbar, 
                  style = engulfing_cond_dn?label.style_label_down:label.style_label_up)
 
-[con_engulfing_dn_loc, con_engulfing_up_loc] = setLocationByATR(con_dn, con_up, 0.5)
+[con_engulfing_dn_loc, con_engulfing_up_loc] = setLocationByATR(con_dn, con_up, offset_atr_engulfing)
 
 plotshape(con_engulfing_dn_loc, "Bearish Engulfing Circle", shape.square, location.absolute, color = color.new(color.blue, 50), size = size.auto, display = enableEngulfing?display.all:display.data_window)
 plotshape(con_engulfing_up_loc, "Bullish Engulfing Circle", shape.square, location.absolute, color = color.new(color.blue, 50), size = size.auto, display = enableEngulfing?display.all:display.data_window)
@@ -159,7 +163,7 @@ if _conditionLOHP
     if _bPivot
         label.new(bar_index[lastHiBar], na, str.tostring(high[lastHiBar], format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.black, size = size.normal)
 
-[con_LOHP_loc1, con_HOLP_loc1] = setLocationByATR(_conditionLOHP, _conditionHOLP, 0.8)
+[con_LOHP_loc1, con_HOLP_loc1] = setLocationByATR(_conditionLOHP, _conditionHOLP, offset_atr_HOLPLOHP)
 
 plotshape(enableHOLPLOHP?con_LOHP_loc1:na,   title = 'LOHP',  style=shape.diamond, location=location.absolute, offset=0, color=color.new(color.orange, 50), size=size.auto, display = enableHOLPLOHP?display.all:display.data_window)
 plotshape(enableHOLPLOHP?con_HOLP_loc1:na,   title = 'HOLP',  style=shape.diamond, location=location.absolute, offset=0, color=color.new(color.orange, 50), size=size.auto, display = enableHOLPLOHP?display.all:display.data_window)
@@ -236,7 +240,7 @@ bool enableHHLL = input.bool(true, "6 Enable HH/LL Indicator")
 hhll_cond_dn = high[0] < high[1] and low[0] < low[1] and high[1] < high[2] and low[1] < low[2] and close[0] < close[2] //and close[1] < open[1]
 hhll_cond_up = high[0] > high[1] and low[0] > low[1] and high[1] > high[2] and low[1] > low[2] and close[0] > close[2] //and close[1] > open[1]
 
-[con_hhll_dn_loc, con_hhll_up_loc] = setLocationByATR(hhll_cond_dn, hhll_cond_up, 0.5)
+[con_hhll_dn_loc, con_hhll_up_loc] = setLocationByATR(hhll_cond_dn, hhll_cond_up, offset_atr_hhll)
 
 plotshape(con_hhll_dn_loc, 'downwards',   style = shape.arrowdown,    location = location.absolute, size = size.auto, color = color.new(color.red, 50),   display = enableHHLL?display.all:display.data_window)
 plotshape(con_hhll_up_loc, 'upwards',     style = shape.arrowup,      location = location.absolute, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
