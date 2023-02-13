@@ -8,7 +8,7 @@ atr = ta.atr(14)
 offset_atr_hhll = 0.5
 offset_atr_engulfing = 0.8
 offset_atr_HOLPLOHP = 1.1
-
+offset_atr_bodymass = 1.3
 
 setLocationByATR(con_dn, con_up, offset) =>
     float con_dn_loc1 = na
@@ -21,23 +21,23 @@ setLocationByATR(con_dn, con_up, offset) =>
 
 // ------------------------------------ COPY OF Engulfing Candlestick Pattern ------------------------------------
 // indicator(title="Candlestick Pattern - Engulfing", shorttitle="Engulfing", overlay=true, precision = 0)
-bool enableEngulfing = input.bool(true, '1. Enable Engulfing signal') // true
+bool enableEngulfing = input.bool(true, 'Enable Engulfing signal', group = "1. Engulfing signal") // true
 
 // Options for setting the minimum requirement of candlestick body to range percentage.
 // It's less important for the left formation to have a fat body.
 // However, for the right formation, namely the engulfing candle, 
 // we want to see higher percentage of body to price range and small wicks
-min_body_to_range_pct_lt   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to price range percentage for the left formation')
-min_body_to_range_pct_rt  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to price range percentage for the right formation')
+min_body_to_range_pct_lt   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to price range percentage for the left formation', group = "1. Engulfing signal")
+min_body_to_range_pct_rt  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to price range percentage for the right formation', group = "1. Engulfing signal")
 
 // Only show engulfing signal if the body of the engulfing candle is larger than 1 Average True Range(ATR)
 // The idea is we prefer engulfing candles that show dominance and mean business.
-filter_by_atr = input.bool(false, "Only display superior engulfing signals", "Only display engulfing candles whose body range is larger than 1 ATR")
+filter_by_atr = input.bool(false, "Only display superior engulfing signals", "Only display engulfing candles whose body range is larger than 1 ATR", group = "1. Engulfing signal")
 
-display_body_to_range_label = input.bool(false, "Display body to price range percentage")
-display_body_range_label = input.bool(false, "Display body of price range")
+display_body_to_range_label = input.bool(false, "Display body to price range percentage", group = "1. Engulfing signal")
+display_body_range_label = input.bool(false, "Display body of price range", group = "1. Engulfing signal")
 
-setting_engulfing_bar_close_beyond_prev_max = input.bool(true, "Engulfing Candle Closes Above/Below Prior Bar's High/Low")
+setting_engulfing_bar_close_beyond_prev_max = input.bool(true, "Engulfing Candle Closes Above/Below Prior Bar's High/Low", group = "1. Engulfing signal")
 
 getRange(x, y) => math.abs(x - y)
 
@@ -99,8 +99,8 @@ plotshape(con_engulfing_up_loc, "Bullish Engulfing Circle", shape.square, locati
 
 // getRange(x, y) => math.abs(x - y)
 
-bool enableInsideBar = input.bool(false, '2. Enable Inside Bar signal') // true
-int minimumCloseTriggerCandle = input.int(50, "Minimum Pencentage of Close of Price Candle Range", step = 5)// The default is 50%, meaning the closing price needs to be above 50% of its price range for a bullish candle
+bool enableInsideBar = input.bool(false, "Enable Inside Bar signal", group = "2. Inside Bar signal") // true
+int minimumCloseTriggerCandle = input.int(50, "Minimum Pencentage of Close of Price Candle Range", step = 5, group = "2. Inside Bar signal")// The default is 50%, meaning the closing price needs to be above 50% of its price range for a bullish candle
 
 range_bar_2 = getRange(high[2], low[2])
 range_bar_1 = getRange(high[1], low[1])
@@ -122,10 +122,10 @@ plotshape(insbar_cond_dn, "Inside Bar Bearish", shape.cross, location.abovebar, 
 // ------------------------------------END OF COPY OF Inside Bar Candlestick Pattern ------------------------------------
 
 // ------------------------------------COPY OF HOLP/LOHP Candlestick Pattern ------------------------------------
-bool enableHOLPLOHP = input.bool(true, '3. Enable HOLP/LOHP signal') // true
-bool _bPivot = input.bool(false, 'Enable Pivot Point')
-_p = input.int(title='Lookback Periods', defval=10, minval=2)
-_b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?')
+bool enableHOLPLOHP = input.bool(true, "Enable HOLP/LOHP signal", group = "3. HOLP/LOHP signal") // true
+bool _bPivot = input.bool(false, 'Enable Pivot Point', group = "3. HOLP/LOHP signal")
+_p = input.int(title='Lookback Periods', defval=10, minval=2, group = "3. HOLP/LOHP signal")
+_b2bar = input.bool(false, 'Trigger bar needs to close below/above pivot bar and its prior bar?', group = "3. HOLP/LOHP signal")
 
 var _boolNewLow = 0
 _sessionLow = 0.0
@@ -178,9 +178,9 @@ plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=loc
 
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
-bool enableKicker = input.bool(true, '4. Enable Candlestick Kicker Pattern') //true
-_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation')
-_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation')
+bool enableKicker = input.bool(true, "Enable Candlestick Kicker Pattern", group = "4. Candlestick Kicker Signal") //true
+_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation', group = "4. Candlestick Kicker Pattern")
+_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation', group = "4. Candlestick Kicker Pattern")
 
 // getRange(x, y) => math.abs(x - y)
 
@@ -203,10 +203,10 @@ plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = sh
 
 //---------------------- COPY OF Body Mass Indicator --------------------------
 // indicator("Body Mass Indicator", "BMI", overlay = true)
-enableBodyMass      = input.bool(true, "5.1 Enable Body Mass Indicator") // true
-enableBodyATRMass   = input.bool(false, "5.2 Enable Body Mass ATR Indicator")
-lookbackperiod = input.int(26, "Look back periods")
-noOfAtr = input.int(1, "Number of ATRs vs body mass")
+enableBodyMass      = input.bool(true, "Enable Body Mass Indicator", group = "5. Body Mass Indicator") // true
+enableBodyATRMass   = input.bool(false, "Enable Body Mass ATR Indicator", group = "5. Body Mass Indicator")
+lookbackperiod = input.int(26, "Look back periods", group = "5. Body Mass Indicator")
+noOfAtr = input.int(1, "Number of ATRs vs body mass", group = "5. Body Mass Indicator")
 
 BodyRange() =>
 	math.abs(close - open) 
@@ -231,11 +231,10 @@ if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 
 // plotshape(highestBodyRange==BodyRange()?highestBodyRange:na,   title = 'Body Mass',  style=shape.flag, location=location.bottom, offset=0, color=color.new(color.yellow, 50), size=size.small, display = enableBodyMass?display.all:display.data_window)
 
-
 //---------------------- END OF COPY OF Body Mass Indicator --------------------------
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
-bool enableHHLL = input.bool(true, "6 Enable HH/LL Indicator")
+bool enableHHLL = input.bool(true, "Enable HH/LL Indicator", group = "6. HH/LL Indicator")
 // 3-bar formation, bar 0 close needs to be lower than bar 2 close
 hhll_cond_dn = high[0] < high[1] and low[0] < low[1] and high[1] < high[2] and low[1] < low[2] and close[0] < close[2] //and close[1] < open[1]
 hhll_cond_up = high[0] > high[1] and low[0] > low[1] and high[1] > high[2] and low[1] > low[2] and close[0] > close[2] //and close[1] > open[1]
@@ -246,3 +245,10 @@ plotshape(con_hhll_dn_loc, 'downwards',   style = shape.arrowdown,    location =
 plotshape(con_hhll_up_loc, 'upwards',     style = shape.arrowup,      location = location.absolute, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
+enableATR_warning      = input.bool(true, "Enable ATR Warning Indicator", group = "6. ATR Warning") // true
+atr_current_bar = ta.atr(1)
+atr_cond_over = atr_current_bar >= atr
+atr_cond_uder = atr_current_bar < atr
+plotshape(atr_cond_over, "Over ATR", style = shape.circle, location = location.bottom, color = color.new(color.black, 0), display = enableATR_warning?display.all:display.none)
+plotshape(atr_cond_uder, "Under ATR", style = shape.circle, location = location.bottom, color = color.new(color.silver, (1-atr_current_bar/atr)*100), display = enableATR_warning?display.all:display.none)
+
