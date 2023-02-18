@@ -8,7 +8,8 @@ atr = ta.atr(14)
 offset_atr_hhll = 0.5
 offset_atr_engulfing = 0.8
 offset_atr_HOLPLOHP = 1.1
-offset_atr_bodymass = 1.3
+offset_atr_bodymass = 1.4
+offset_atr_4barfractal = 1.7
 
 setLocationByATR(con_dn, con_up, offset) =>
     float con_dn_loc1 = na
@@ -179,8 +180,8 @@ plotshape(_sessionHigh, title = 'Session High', style=shape.xcross, location=loc
 //---------------------- COPY OF Candlestick Kicker --------------------------
 
 bool enableKicker = input.bool(true, "Enable Candlestick Kicker Pattern", group = "4. Candlestick Kicker Signal") //true
-_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation', group = "4. Candlestick Kicker Pattern")
-_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation', group = "4. Candlestick Kicker Pattern")
+_bodyPencLeft   = input.int(0, 'Minimum body % for left bar',   minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the left formation', group = "4. Candlestick Kicker Signal")
+_bodyPencRight  = input.int(0, 'Minimum body % for right bar',  minval=0, maxval=100, step=5, tooltip = 'Minimum body to range percentage for the right formation', group = "4. Candlestick Kicker Signal")
 
 // getRange(x, y) => math.abs(x - y)
 
@@ -216,9 +217,9 @@ highestBodyRange = ta.highest(BodyRange(), lookbackperiod)
 
 if highestBodyRange==BodyRange() and enableBodyMass
 	if close > open
-    	label.new(bar_index, na, "▲\n" + str.tostring(highestBodyRange, format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.new(color.black, 20), size = size.normal)
+    	label.new(bar_index, na, str.tostring(highestBodyRange, format.mintick), yloc = yloc.belowbar, style = label.style_none, textcolor = color.new(color.black, 20), size = size.normal) //"▲\n" + 
 	else if close < open
-		label.new(bar_index, na, str.tostring(highestBodyRange, format.mintick) + "\n▼", yloc = yloc.abovebar, style = label.style_none, textcolor = color.new(color.black, 20), size = size.normal)
+		label.new(bar_index, na, str.tostring(highestBodyRange, format.mintick), yloc = yloc.abovebar, style = label.style_none, textcolor = color.new(color.black, 20), size = size.normal) // + "\n▼"
 
 if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 	if close > open
@@ -245,10 +246,20 @@ plotshape(con_hhll_dn_loc, 'downwards',   style = shape.arrowdown,    location =
 plotshape(con_hhll_up_loc, 'upwards',     style = shape.arrowup,      location = location.absolute, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
-enableATR_warning      = input.bool(true, "Enable ATR Warning Indicator", group = "6. ATR Warning") // true
+enableATR_warning      = input.bool(false, "Enable ATR Warning Indicator", group = "6. ATR Warning") // true
 atr_current_bar = ta.atr(1)
 atr_cond_over = atr_current_bar >= atr
 atr_cond_uder = atr_current_bar < atr
 plotshape(atr_cond_over, "Over ATR", style = shape.circle, location = location.bottom, color = color.new(color.black, 0), display = enableATR_warning?display.all:display.none)
 plotshape(atr_cond_uder, "Under ATR", style = shape.circle, location = location.bottom, color = color.new(color.silver, (1-atr_current_bar/atr)*100), display = enableATR_warning?display.all:display.none)
+//---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
 
+//---------------------- Tom's 4 bar fractal ----------------------//
+bool enable4barf = input.bool(true, "Enable 4-Bar Fractalr", group = "7. 4 Bar Fractal - Tom Hougaard")
+barf_cond_up = close[0] > high[1] and close[0] > high[3]
+barf_cond_dn = close[0] < low[1]  and close[0] < low[3]
+[con_4bar_loc1, con_4bar_loc2] = setLocationByATR(barf_cond_dn, barf_cond_up, offset_atr_4barfractal)
+plotshape(con_4bar_loc2, "4 Bar Fractal Up",    style = shape.arrowup,      location = location.absolute, size = size.auto, color = color.new(color.purple, 0), display = enable4barf?display.all:display.none)
+plotshape(con_4bar_loc1, "4 Bar Fractal Down",  style = shape.arrowdown,    location = location.absolute, size = size.auto, color = color.new(color.purple, 0), display = enable4barf?display.all:display.none)
+
+//---------------------- Tom's 4 bar fractal ----------------------//
