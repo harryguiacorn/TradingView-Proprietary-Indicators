@@ -235,7 +235,7 @@ if BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass
 //---------------------- END OF COPY OF Body Mass Indicator --------------------------
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
-bool enableHHLL = input.bool(true, "Enable HH/LL Indicator", group = "6. HH/LL Indicator")
+bool enableHHLL = input.bool(true, "Enable Higher Highs and Lower Lows Indicator", group = "6. Candlestick Higher Highs and Lower Lows Indicator")
 // 3-bar formation, bar 0 close needs to be lower than bar 2 close
 hhll_cond_dn = high[0] < high[1] and low[0] < low[1] and high[1] < high[2] and low[1] < low[2] and close[0] < close[2] //and close[1] < open[1]
 hhll_cond_up = high[0] > high[1] and low[0] > low[1] and high[1] > high[2] and low[1] > low[2] and close[0] > close[2] //and close[1] > open[1]
@@ -246,7 +246,7 @@ plotshape(con_hhll_dn_loc, 'downwards',   style = shape.arrowdown,    location =
 plotshape(con_hhll_up_loc, 'upwards',     style = shape.arrowup,      location = location.absolute, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
-enableATR_warning      = input.bool(false, "Enable ATR Warning Indicator", group = "6. ATR Warning") // true
+enableATR_warning      = input.bool(false, "Enable ATR Warning Indicator", group = "7. ATR Warning") // true
 atr_current_bar = ta.atr(1)
 atr_cond_over = atr_current_bar >= atr
 atr_cond_uder = atr_current_bar < atr
@@ -255,7 +255,7 @@ plotshape(atr_cond_uder, "Under ATR", style = shape.circle, location = location.
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
 
 //---------------------- Tom's 4 bar fractal ----------------------//
-bool enable4barf = input.bool(true, "Enable 4-Bar Fractalr", group = "7. 4 Bar Fractal - Tom Hougaard")
+bool enable4barf = input.bool(true, "Enable 4-Bar Fractalr", group = "8. 4-Bar Fractal - Tom Hougaard")
 barf_cond_up = close[0] > high[1] and close[0] > high[3]
 barf_cond_dn = close[0] < low[1]  and close[0] < low[3]
 [con_4bar_loc1, con_4bar_loc2] = setLocationByATR(barf_cond_dn, barf_cond_up, offset_atr_4barfractal)
