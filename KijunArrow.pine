@@ -2,6 +2,7 @@
 indicator('Kijun Arrow', 'Kijun', overlay=true)
 bool display_ichimoku = input.bool(true, 'Enable Ichimoku Cloud')
 bool display_chikou_span = input.bool(false, 'Enable Chikou Span')// Default is off, as it can be messy if otherwise
+bool display_chikou_span_filter_by_kijun = input.bool(true, 'Enable Chikou Span when Kijun-sen changes direction')
 conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
 basePeriodsK = input.int(26, minval=1, title='Kijun-Sen (Base Line) Periods')
 getMidPoint(__len, __offset) =>
@@ -56,5 +57,5 @@ cond_up_arrow = _newDirection==1
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
 plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
 plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
-plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8)
-plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8)
+plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
+plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
