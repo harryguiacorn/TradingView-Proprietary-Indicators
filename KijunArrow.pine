@@ -1,22 +1,49 @@
 //@version=5
 indicator('Kijun Arrow', 'Kijun', overlay=true)
-bool display_ichimoku = input.bool(true, 'Enable Ichimoku Cloud')
-bool display_chikou_span = input.bool(false, 'Enable Chikou Span')// Default is off, as it can be messy if otherwise
-bool display_chikou_span_filter_by_kijun = input.bool(true, 'Enable Chikou Span when Kijun-sen changes direction')
-conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
-basePeriodsK = input.int(26, minval=1, title='Kijun-Sen (Base Line) Periods')
+//-------------------- parameters --------------------
+atr = ta.atr(14)
+offset_atr_arrow = 1.4
+
+//---------------- functions ----------------
+// GetATR() =>
+//     atr = ta.atr(14)
+
+GetPipSize() =>
+    pipSizeCalc = syminfo.mintick * (syminfo.type == "forex" ? 10 : 1)
+    request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
+    
+GetPipSizeSymbol(symbol) =>
+    pipSizeCalc = syminfo.mintick * (syminfo.type == "forex" ? 10 : 1)
+    request.security(syminfo.tickerid, "D", pipSizeCalc[1], 
+         lookahead=barmerge.lookahead_on)
+
 getMidPoint(__len, __offset) =>
     MidPointOffset = math.avg(ta.lowest(__len)[__offset], ta.highest(__len)[__offset])
+
+setLocationByATR(con_dn, con_up, offset) =>
+    float con_dn_loc1 = na
+    if con_dn
+        con_dn_loc1 := high + offset * atr
+    float con_up_loc1 = na
+    if con_up
+        con_up_loc1 := low - offset * atr
+    [con_dn_loc1, con_up_loc1]
+
+var grp1 = "Ichimoku Cloud"
+bool display_ichimoku = input.bool(true, 'Enable Ichimoku Cloud', group = grp1)
+bool display_chikou_span = input.bool(false, 'Enable Chikou Span', group = grp1)// Default is off, as it can be messy if otherwise
+bool display_chikou_span_filter_by_kijun = input.bool(true, 'Enable Chikou Span when Kijun-sen changes direction', group = grp1)
+conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
+basePeriodsK = input.int(26, minval=1, title='Kijun-Sen (Base Line) Periods')
 Kijun = getMidPoint(basePeriodsK, 0)
 //MODIFIED FROM OFFICIAL ICHIMOKU PINE SCRIPT
-senkou2Periods = input.int(52, minval=1, title='Senkou Span 2 Periods')
-_displacement = input.int(26, minval=1, title='Displacement')
-donchian(len) =>
-    math.avg(ta.lowest(len), ta.highest(len))
-conversionLine = donchian(conversionPeriods)
-baseLine = donchian(basePeriodsK)
+senkou2Periods = input.int(52, minval=1, title='Senkou Span 2 Periods', group = grp1)
+_displacement = input.int(26, minval=1, title='Displacement', group = grp1)
+
+conversionLine = getMidPoint(conversionPeriods, 0)
+baseLine = getMidPoint(basePeriodsK, 0)
 leadLine1 = math.avg(conversionLine, baseLine)
-leadLine2 = donchian(senkou2Periods)
+leadLine2 = getMidPoint(senkou2Periods, 0)
 plot(display_ichimoku?conversionLine:na, color=color.new(color.fuchsia, 50), linewidth=1, title='Tenkan-Sen (Conversion Line)')
 plot(display_ichimoku?baseLine:na, color=color.new(color.blue, 20), linewidth=2, title='Kijun-Sen (Base Line)')
 plot(display_ichimoku?close:na, offset=-_displacement, color=color.new(color.black, 80), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=3, display = display_chikou_span? display.all: display.none)
@@ -37,18 +64,6 @@ if _curArrowDirection != _existingArrowDirection
 bool _bChikouSpanLn = close[0] > close[_displacement]
 bool _bChikouSpanSt = close[0] < close[_displacement]
 
-atr = ta.atr(14)
-offset_atr_arrow = 1.4
-
-setLocationByATR(con_dn, con_up, offset) =>
-    float con_dn_loc1 = na
-    if con_dn
-        con_dn_loc1 := high + offset * atr
-    float con_up_loc1 = na
-    if con_up
-        con_up_loc1 := low - offset * atr
-    [con_dn_loc1, con_up_loc1]
-
 cond_dn_arrow = _newDirection==-1
 cond_up_arrow = _newDirection==1
 [con_dn_arrow_loc, con_up_arrow_loc] = setLocationByATR(cond_dn_arrow, cond_up_arrow, offset_atr_arrow)
@@ -59,3 +74,48 @@ plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = locatio
 plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
 plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
 plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
+
+// ------------------ table --------------------------
+// We use `var` to only initialize the table on the first bar.
+// var table atrDisplay = table.new(position.top_right, 1, 1)
+// Calculate ATR in pips
+// atrPips = math.round_to_mintick(atr / GetPipSize()) 
+
+// KijunD = getMidPoint(basePeriodsK, 0)
+// request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
+
+// if barstate.islast
+//     table.cell(atrDisplay, 0, 0, str.tostring(atrPips))
+
+var grp2 = "Multi-timeframe (MTF)"
+bool display_mtk = input.bool(false, 'Enable Multi Timeframe Kijun-sen', group = grp2)
+k_request = getMidPoint(26, 0)
+
+float chartTFInMinutes = timeframe.in_seconds() / 60
+display_limit_60 = timeframe.isintraday and chartTFInMinutes < 60
+display_limit_240 = timeframe.isintraday and chartTFInMinutes < 240
+display_limit_1440 = timeframe.isintraday and chartTFInMinutes < 1440
+
+tf_1 = input.timeframe(title="Timeframe 1", defval="60", options=['60', '240', '1D', '1W', '1M'])
+k_1 = request.security(syminfo.tickerid, tf_1, k_request)
+plot(display_limit_60 ? k_1 : na, color=color.purple, display = display_mtk? display.all:display.none)
+
+tf_2 = input.timeframe(title="Timeframe 2", defval="240", options=['60', '240', '1D', '1W', '1M'])
+k_2 = request.security(syminfo.tickerid, tf_2, k_request)
+plot(display_limit_240 ? k_2 : na, color=color.purple, display = display_mtk? display.all:display.none)
+
+tf_3 = input.timeframe(title="Timeframe 3", defval="1D", options=['60', '240', '1D', '1W', '1M'])
+k_3 = request.security(syminfo.tickerid, tf_3, k_request)
+plot(display_limit_1440 ? k_3 : na, color=color.purple, display = display_mtk? display.all:display.none)
+
+if display_mtk
+    var l_k_1 = label.new(x = bar_index, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1h")
+    label.set_xy(display_limit_60 ? l_k_1 : na, x = bar_index, y = k_1)
+    var l_k_2 = label.new(x = bar_index, y = k_2, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-4h")
+    label.set_xy(display_limit_240 ? l_k_2 : na, x = bar_index, y = k_2)
+    var l_k_3 = label.new(x = bar_index, y = k_3, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
+    label.set_xy(display_limit_1440 ? l_k_3 : na, x = bar_index, y = k_3)
+
+
+
+
