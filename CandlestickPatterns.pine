@@ -214,6 +214,10 @@ noOfAtr = input.int(1, "Number of ATRs vs body mass", group = "5. Body Mass Indi
 GetPipSize() =>
     pipSizeCalc = syminfo.type == "forex" ? syminfo.mintick *10 : 1
 
+// label format messed up forex mintick, therefore forex format has to be specified, other types work with format.mintick
+GetFormat() =>
+    stringFormat = syminfo.type == "forex" ? '#.##' : format.mintick
+
 BodyRange() =>
 	math.abs(close - open) 
     
@@ -235,9 +239,9 @@ bmass_cond_up = BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRM
 bmass_cond_dn = BodyRange()> ta.atr(lookbackperiod) * noOfAtr and enableBodyATRMass and close < open
 [con_bmass_loc1, con_bmass_loc2] = setLocationByATR(bmass_cond_dn, bmass_cond_up, offset_atr_bodymass)
 if bmass_cond_up
-    label.new(bar_index, con_bmass_loc2, "▲\n" + str.tostring(GetBodyRangeFormatted(BodyRange())), style = label.style_none, textcolor = color.new(color.black, 50), size = size.normal)
+    label.new(bar_index, con_bmass_loc2, "▲\n" + str.tostring(GetBodyRangeFormatted(BodyRange()), GetFormat()), style = label.style_none, textcolor = color.new(color.black, 50), size = size.normal)
 else if bmass_cond_dn
-    label.new(bar_index, con_bmass_loc1, str.tostring(GetBodyRangeFormatted(BodyRange())) + "\n▼", style = label.style_none, textcolor = color.new(color.black, 50), size = size.normal)
+    label.new(bar_index, con_bmass_loc1, str.tostring(GetBodyRangeFormatted(BodyRange()), GetFormat()) + "\n▼", style = label.style_none, textcolor = color.new(color.black, 50), size = size.normal)
 
 //Display every candlestick range for testing environment
 // label.new(bar_index[0], na, str.tostring(BodyRange(), format.mintick) + "", yloc = yloc.belowbar, style = label.style_none, textcolor = color.black, size = size.normal)
