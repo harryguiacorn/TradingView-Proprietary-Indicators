@@ -2,7 +2,7 @@
 indicator('Kijun Arrow', 'Kijun', overlay=true)
 //-------------------- parameters --------------------
 atr = ta.atr(14)
-offset_atr_arrow = 1.4
+offset_atr_arrow = 0.2
 
 //---------------- functions ----------------
 // GetATR() =>
@@ -14,8 +14,7 @@ GetPipSize() =>
     
 GetPipSizeSymbol(symbol) =>
     pipSizeCalc = syminfo.mintick * (syminfo.type == "forex" ? 10 : 1)
-    request.security(syminfo.tickerid, "D", pipSizeCalc[1], 
-         lookahead=barmerge.lookahead_on)
+    request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
 
 getMidPoint(__len, __offset) =>
     MidPointOffset = math.avg(ta.lowest(__len)[__offset], ta.highest(__len)[__offset])
@@ -92,9 +91,9 @@ bool display_mtk = input.bool(false, 'Enable Multi Timeframe Kijun-sen', group =
 k_request = getMidPoint(26, 0)
 
 float chartTFInMinutes = timeframe.in_seconds() / 60
-display_limit_60 = timeframe.isintraday and chartTFInMinutes < 60
-display_limit_240 = timeframe.isintraday and chartTFInMinutes < 240
-display_limit_1440 = timeframe.isintraday and chartTFInMinutes < 1440
+display_limit_60 = display_mtk and timeframe.isintraday and chartTFInMinutes < 60
+display_limit_240 = display_mtk and timeframe.isintraday and chartTFInMinutes < 240
+display_limit_1440 = display_mtk and timeframe.isintraday and chartTFInMinutes < 1440
 
 tf_1 = input.timeframe(title="Timeframe 1", defval="60", options=['60', '240', '1D', '1W', '1M'])
 k_1 = request.security(syminfo.tickerid, tf_1, k_request)
@@ -109,12 +108,12 @@ k_3 = request.security(syminfo.tickerid, tf_3, k_request)
 plot(display_limit_1440 ? k_3 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
 if display_mtk
-    var l_k_1 = label.new(x = bar_index, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1h")
-    label.set_xy(display_limit_60 ? l_k_1 : na, x = bar_index, y = k_1)
-    var l_k_2 = label.new(x = bar_index, y = k_2, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-4h")
-    label.set_xy(display_limit_240 ? l_k_2 : na, x = bar_index, y = k_2)
-    var l_k_3 = label.new(x = bar_index, y = k_3, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
-    label.set_xy(display_limit_1440 ? l_k_3 : na, x = bar_index, y = k_3)
+    var l_k_1 = label.new(x = bar_index + 1, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1h")
+    label.set_xy(display_limit_60 ? l_k_1 : na, x = bar_index + 1, y = k_1)
+    var l_k_2 = label.new(x = bar_index + 1, y = k_2, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-4h")
+    label.set_xy(display_limit_240 ? l_k_2 : na, x = bar_index + 1, y = k_2)
+    var l_k_3 = label.new(x = bar_index + 1, y = k_3, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
+    label.set_xy(display_limit_1440 ? l_k_3 : na, x = bar_index + 1, y = k_3)
 
 
 
