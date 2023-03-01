@@ -87,33 +87,45 @@ plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offs
 //     table.cell(atrDisplay, 0, 0, str.tostring(atrPips))
 
 var grp2 = "Multi-timeframe (MTF)"
-bool display_mtk = input.bool(false, 'Enable Multi Timeframe Kijun-sen', group = grp2)
+bool display_mtk = input.bool(true, 'Enable Multi Timeframe Kijun-sen', group = grp2)
 k_request = getMidPoint(26, 0)
 
+bool_tf1 = input.bool(true, "Enable", inline = "tf_1")
+bool_tf2 = input.bool(true, "Enable", inline = "tf_2")
+bool_tf3 = input.bool(true, "Enable", inline = "tf_3")
+bool_tf4 = input.bool(true, "Enable", inline = "tf_4")
+
 float chartTFInMinutes = timeframe.in_seconds() / 60
-display_limit_60 = display_mtk and timeframe.isintraday and chartTFInMinutes < 60
-display_limit_240 = display_mtk and timeframe.isintraday and chartTFInMinutes < 240
-display_limit_1440 = display_mtk and timeframe.isintraday and chartTFInMinutes < 1440
+display_limit_1440  = display_mtk and timeframe.isintraday and chartTFInMinutes < 1440  and bool_tf1
+display_limit_240   = display_mtk and timeframe.isintraday and chartTFInMinutes < 240   and bool_tf2
+display_limit_60    = display_mtk and timeframe.isintraday and chartTFInMinutes < 60    and bool_tf3
+display_limit_15    = display_mtk and timeframe.isintraday and chartTFInMinutes < 15    and bool_tf4
 
-tf_1 = input.timeframe(title="Timeframe 1", defval="60", options=['60', '240', '1D', '1W', '1M'])
+tf_1 = input.timeframe(title="Timeframe 1", defval="1D", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_1")
 k_1 = request.security(syminfo.tickerid, tf_1, k_request)
-plot(display_limit_60 ? k_1 : na, color=color.purple, display = display_mtk? display.all:display.none)
+plot(display_limit_1440 ? k_1 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
-tf_2 = input.timeframe(title="Timeframe 2", defval="240", options=['60', '240', '1D', '1W', '1M'])
+tf_2 = input.timeframe(title="Timeframe 2", defval="240", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_2")
 k_2 = request.security(syminfo.tickerid, tf_2, k_request)
 plot(display_limit_240 ? k_2 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
-tf_3 = input.timeframe(title="Timeframe 3", defval="1D", options=['60', '240', '1D', '1W', '1M'])
+tf_3 = input.timeframe(title="Timeframe 3", defval="60", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_3")
 k_3 = request.security(syminfo.tickerid, tf_3, k_request)
-plot(display_limit_1440 ? k_3 : na, color=color.purple, display = display_mtk? display.all:display.none)
+plot(display_limit_60 ? k_3 : na, color=color.purple, display = display_mtk? display.all:display.none)
+
+tf_4 = input.timeframe(title="Timeframe 4", defval="15", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_4")
+k_4 = request.security(syminfo.tickerid, tf_4, k_request)
+plot(display_limit_15 ? k_4 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
 if display_mtk
-    var l_k_1 = label.new(x = bar_index + 1, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1h")
-    label.set_xy(display_limit_60 ? l_k_1 : na, x = bar_index + 1, y = k_1)
+    var l_k_1 = label.new(x = bar_index + 1, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
+    label.set_xy(display_limit_1440 ? l_k_1 : na, x = bar_index + 1, y = k_1)
     var l_k_2 = label.new(x = bar_index + 1, y = k_2, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-4h")
     label.set_xy(display_limit_240 ? l_k_2 : na, x = bar_index + 1, y = k_2)
-    var l_k_3 = label.new(x = bar_index + 1, y = k_3, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
-    label.set_xy(display_limit_1440 ? l_k_3 : na, x = bar_index + 1, y = k_3)
+    var l_k_3 = label.new(x = bar_index + 1, y = k_3, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1h")
+    label.set_xy(display_limit_60 ? l_k_3 : na, x = bar_index + 1, y = k_3)
+    var l_k_4 = label.new(x = bar_index + 1, y = k_4, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-15m")
+    label.set_xy(display_limit_15 ? l_k_4 : na, x = bar_index + 1, y = k_4)
 
 
 
