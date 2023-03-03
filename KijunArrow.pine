@@ -19,6 +19,10 @@ GetPipSizeSymbol(symbol) =>
 getMidPoint(__len, __offset) =>
     MidPointOffset = math.avg(ta.lowest(__len)[__offset], ta.highest(__len)[__offset])
 
+getKijun(__symbol, __timeframe, __offset=0)=>
+    __k_request = getMidPoint(26, __offset)
+    k = request.security(__symbol, __timeframe, __k_request)
+
 setLocationByATR(con_dn, con_up, offset) =>
     float con_dn_loc1 = na
     if con_dn
@@ -40,7 +44,8 @@ senkou2Periods = input.int(52, minval=1, title='Senkou Span 2 Periods', group = 
 _displacement = input.int(26, minval=1, title='Displacement', group = grp1)
 
 conversionLine = getMidPoint(conversionPeriods, 0)
-baseLine = getMidPoint(basePeriodsK, 0)
+// baseLine = getMidPoint(basePeriodsK, 0)
+baseLine = getKijun(syminfo.tickerid, timeframe.period)
 leadLine1 = math.avg(conversionLine, baseLine)
 leadLine2 = getMidPoint(senkou2Periods, 0)
 plot(display_ichimoku?conversionLine:na, color=color.new(color.fuchsia, 50), linewidth=1, title='Tenkan-Sen (Conversion Line)')
@@ -56,7 +61,7 @@ else if Kijun[0] - Kijun[1] < 0
     -1
 var _existingArrowDirection = 0
 int _newDirection = 0
-if _curArrowDirection != _existingArrowDirection
+if _curArrowDirection != _existingArrowDirection and _curArrowDirection != 0
     _newDirection := _curArrowDirection
     _existingArrowDirection := _curArrowDirection
 
@@ -74,21 +79,9 @@ plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = locatio
 plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
 plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
 
-// ------------------ table --------------------------
-// We use `var` to only initialize the table on the first bar.
-// var table atrDisplay = table.new(position.top_right, 1, 1)
-// Calculate ATR in pips
-// atrPips = math.round_to_mintick(atr / GetPipSize()) 
-
-// KijunD = getMidPoint(basePeriodsK, 0)
-// request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
-
-// if barstate.islast
-//     table.cell(atrDisplay, 0, 0, str.tostring(atrPips))
-
+//--------------------------------- Multi-timeframe (MTF) Kijun ---------------------------------
 var grp2 = "Multi-timeframe (MTF)"
-bool display_mtk = input.bool(true, 'Enable Multi Timeframe Kijun-sen', group = grp2)
-k_request = getMidPoint(26, 0)
+bool display_mtk = input.bool(false, 'Enable Multi Timeframe Kijun-sen', group = grp2)
 
 bool_tf1 = input.bool(true, "Enable", inline = "tf_1")
 bool_tf2 = input.bool(true, "Enable", inline = "tf_2")
@@ -102,25 +95,27 @@ display_limit_60    = display_mtk and timeframe.isintraday and chartTFInMinutes 
 display_limit_15    = display_mtk and timeframe.isintraday and chartTFInMinutes < 15    and bool_tf4
 
 tf_1 = input.timeframe(title="Timeframe 1", defval="1D", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_1")
-k_1 = request.security(syminfo.tickerid, tf_1, k_request)
+k_1 = getKijun(syminfo.tickerid, tf_1)
 plot(display_limit_1440 ? k_1 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
 tf_2 = input.timeframe(title="Timeframe 2", defval="240", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_2")
-k_2 = request.security(syminfo.tickerid, tf_2, k_request)
+k_2 = getKijun(syminfo.tickerid, tf_2)
 plot(display_limit_240 ? k_2 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
 tf_3 = input.timeframe(title="Timeframe 3", defval="60", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_3")
-k_3 = request.security(syminfo.tickerid, tf_3, k_request)
+k_3 = getKijun(syminfo.tickerid, tf_3)
 plot(display_limit_60 ? k_3 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
 tf_4 = input.timeframe(title="Timeframe 4", defval="15", options=['15', '60', '240', '1D', '1W', '1M'], inline = "tf_4")
-k_4 = request.security(syminfo.tickerid, tf_4, k_request)
+k_4 = getKijun(syminfo.tickerid, tf_4)
 plot(display_limit_15 ? k_4 : na, color=color.purple, display = display_mtk? display.all:display.none)
+
 
 if display_mtk
     var l_k_1 = label.new(x = bar_index + 1, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
     label.set_xy(display_limit_1440 ? l_k_1 : na, x = bar_index + 1, y = k_1)
     var l_k_2 = label.new(x = bar_index + 1, y = k_2, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-4h")
+    // label.set_text(l_k_2, str.tostring(_existingArrowDirection) + " K-4h")
     label.set_xy(display_limit_240 ? l_k_2 : na, x = bar_index + 1, y = k_2)
     var l_k_3 = label.new(x = bar_index + 1, y = k_3, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1h")
     label.set_xy(display_limit_60 ? l_k_3 : na, x = bar_index + 1, y = k_3)
@@ -128,5 +123,15 @@ if display_mtk
     label.set_xy(display_limit_15 ? l_k_4 : na, x = bar_index + 1, y = k_4)
 
 
+// ------------------ table --------------------------
+// We use `var` to only initialize the table on the first bar.
+var table atrDisplay = table.new(position.top_right, 1, 1)
+// Calculate ATR in pips
+atrPips = math.round_to_mintick(atr / GetPipSize()) 
 
+// KijunD = getMidPoint(basePeriodsK, 0)
+// request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
+
+if barstate.islast
+    table.cell(atrDisplay, 0, 0, str.tostring(_existingArrowDirection))
 
