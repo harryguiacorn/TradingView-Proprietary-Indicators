@@ -208,7 +208,7 @@ plotshape(condition_kicker_dn_threshold?close:na, 'kicker downwards', style = sh
 // indicator("Body Mass Indicator", "BMI", overlay = true)
 enableBodyMass      = input.bool(true, "Enable Body Mass Indicator", group = "5. Body Mass Indicator") // true
 enableBodyATRMass   = input.bool(false, "Enable Body Mass ATR Indicator", group = "5. Body Mass Indicator")
-lookbackperiod = input.int(26, "Look back periods", group = "5. Body Mass Indicator")
+lookbackperiod = input.int(10, "Look back periods", group = "5. Body Mass Indicator")
 noOfAtr = input.int(1, "Number of ATRs vs body mass", group = "5. Body Mass Indicator")
 
 GetPipSize() =>
