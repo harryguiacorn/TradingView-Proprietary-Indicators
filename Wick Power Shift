@@ -1,0 +1,30 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+//@version=5
+indicator(title="Wick Power Shift")
+
+length_wicks = input.int(10, "Length of wicks", 1, step = 1)
+
+// ------------------------- Lower wick -------------------------
+// LowerWickRange() returns the bar's lower wick range, which is the
+// distance between the low and open (green bars) or close (red bars).
+LowerWickRange() =>
+	math.min(open, close) - low
+
+// Compute the sma of the lower wick size
+avgDownWick = ta.sma(LowerWickRange(), length_wicks)
+
+// Plot the average down wick size with a line
+plot(avgDownWick, style=plot.style_columns, color=color.green, title="Average Down Wick")
+
+// ------------------------- Upper wick -------------------------
+// UpperWickRange() returns the bar's upper wick range, which is the
+// difference between the high and open (red bars) or close (green bars).
+UpperWickRange() =>
+	high - math.max(open, close)
+
+// Compute the sma of the bar's upper wick range
+avgUpWick = ta.sma(UpperWickRange(), length_wicks)
+
+// Show the average upper wick size with a line
+plot(avgUpWick, style=plot.style_columns, color=color.red, title="Average Upper Wick")
