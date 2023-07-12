@@ -1,20 +1,13 @@
 //@version=5
-indicator('Kijun Arrow', 'Kijun', overlay=true)
+indicator('Ichimoku Cloud', 'Cloud', overlay=true)
 //-------------------- parameters --------------------
 atr = ta.atr(14)
 offset_atr_arrow = 0.2
 
 //---------------- functions ----------------
-// GetATR() =>
-//     atr = ta.atr(14)
-
-GetPipSize() =>
-    pipSizeCalc = syminfo.mintick * (syminfo.type == "forex" ? 10 : 1)
-    request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
-    
-GetPipSizeSymbol(symbol) =>
-    pipSizeCalc = syminfo.mintick * (syminfo.type == "forex" ? 10 : 1)
-    request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
+GetCorrectTickValue(value) =>
+    pipSizeCalc = (syminfo.type == "forex" ? syminfo.mintick * 10 : 1)
+    value / pipSizeCalc
 
 getMidPoint(__len, __offset) =>
     MidPointOffset = math.avg(ta.lowest(__len)[__offset], ta.highest(__len)[__offset])
@@ -34,8 +27,9 @@ setLocationByATR(con_dn, con_up, offset) =>
 
 var grp1 = "Ichimoku Cloud"
 bool display_ichimoku = input.bool(true, 'Enable Ichimoku Cloud', group = grp1)
-bool display_chikou_span = input.bool(false, 'Enable Chikou Span', group = grp1)// Default is off, as it can be messy if otherwise
-bool display_chikou_span_filter_by_kijun = input.bool(true, 'Enable Chikou Span when Kijun-sen changes direction', group = grp1)
+bool display_kijun_arrow = input.bool(true, 'Enable Kijun Arrow', group = grp1)
+bool display_chikou_span = input.bool(true, 'Enable Chikou Span', group = grp1)// Default is off, as it can be messy if otherwise
+bool display_chikou_span_filter_by_kijun = input.bool(false, 'Enable Chikou Span when Kijun-sen changes direction', group = grp1)
 conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
 basePeriodsK = input.int(26, minval=1, title='Kijun-Sen (Base Line) Periods')
 Kijun = getMidPoint(basePeriodsK, 0)
@@ -74,8 +68,8 @@ cond_up_arrow = _newDirection==1
 
 // I'm using plotchar instead to place arrows above or below Kijunsen, which saves space for other signals
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
-plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
-plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
+plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_kijun_arrow?display.all:display.none)
+plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_kijun_arrow?display.all:display.none)
 plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
 plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
 
@@ -110,7 +104,6 @@ tf_4 = input.timeframe(title="Timeframe 4", defval="15", options=['15', '60', '2
 k_4 = getKijun(syminfo.tickerid, tf_4)
 plot(display_limit_15 ? k_4 : na, color=color.purple, display = display_mtk? display.all:display.none)
 
-
 if display_mtk
     var l_k_1 = label.new(x = bar_index + 1, y = k_1, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-1D")
     label.set_xy(display_limit_1440 ? l_k_1 : na, x = bar_index + 1, y = k_1)
@@ -122,16 +115,37 @@ if display_mtk
     var l_k_4 = label.new(x = bar_index + 1, y = k_4, style = label.style_label_left, color = color.rgb(0, 0, 0, 100), textcolor = color.purple, text = "K-15m")
     label.set_xy(display_limit_15 ? l_k_4 : na, x = bar_index + 1, y = k_4)
 
-
 // ------------------ table --------------------------
-// We use `var` to only initialize the table on the first bar.
-var table atrDisplay = table.new(position.top_right, 1, 1)
 // Calculate ATR in pips
-atrPips = math.round_to_mintick(atr / GetPipSize()) 
+trValueCur = math.round_to_mintick(GetCorrectTickValue(ta.tr(true)))
+trValueDaily = request.security(syminfo.tickerid, "1D", trValueCur)
+atrValueCur = math.round_to_mintick(GetCorrectTickValue(atr)) 
+atrValueDaily = request.security(syminfo.tickerid, "1D", atrValueCur)
+
+var string GP2 = "ATR table"
+string  tableYposInput = input.string("top", "Panel position", inline = "11", options = ["top", "middle", "bottom"], group = GP2)
+string  tableXposInput = input.string("right", "", inline = "11", options = ["left", "center", "right"], group = GP2)
+color   bullColorInput = input.color(color.new(color.green, 30), "Bull", inline = "12", group = GP2)
+color   bearColorInput = input.color(color.new(color.red, 30), "Bear", inline = "12", group = GP2)
+color   neutColorInput = input.color(color.new(color.gray, 80), "Neutral", inline = "12", group = GP2)
 
 // KijunD = getMidPoint(basePeriodsK, 0)
 // request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
 
-if barstate.islast
-    table.cell(atrDisplay, 0, 0, str.tostring(_existingArrowDirection))
+var table panel = table.new(tableYposInput + "_" + tableXposInput, 3, 3)
 
+if barstate.islast
+    bgColorCur = trValueCur > atrValueCur ? bearColorInput : bullColorInput
+    bgColorDaily = trValueDaily > atrValueDaily ? bearColorInput : bullColorInput
+
+    // Table header.
+    table.cell(panel, 0, 0, "Period", bgcolor = neutColorInput)
+    table.cell(panel, 1, 0, "Range", bgcolor = neutColorInput)
+    table.cell(panel, 2, 0, "ATR", bgcolor = neutColorInput)
+    // table.cell(panel, 0, 1, timeframe.period, bgcolor = neutColorInput)
+    // table.cell(panel, 1, 1, str.tostring(trValueCur), bgcolor = bgColorCur)
+    // table.cell(panel, 2, 1, str.tostring(atrValueCur), bgcolor = neutColorInput)
+    table.cell(panel, 0, 2, "D", bgcolor = neutColorInput)
+    table.cell(panel, 1, 2, str.tostring(trValueDaily), bgcolor = bgColorDaily)
+    table.cell(panel, 2, 2, str.tostring(atrValueDaily), bgcolor = neutColorInput)
+    // table.cell(atrDisplay, 0, 0, str.tostring(_existingArrowDirection))
