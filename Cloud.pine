@@ -16,6 +16,11 @@ getKijun(__symbol, __timeframe, __offset=0)=>
     __k_request = getMidPoint(26, __offset)
     k = request.security(__symbol, __timeframe, __k_request)
 
+
+getCloudDirectionMultiTF(__symbol, __timeframe, __offset=0)=>
+    __c_request = getMidPoint(26, __offset)
+    c = request.security(__symbol, __timeframe, __c_request)
+
 setLocationByATR(con_dn, con_up, offset) =>
     float con_dn_loc1 = na
     if con_dn
@@ -24,10 +29,9 @@ setLocationByATR(con_dn, con_up, offset) =>
     if con_up
         con_up_loc1 := low - offset * atr
     [con_dn_loc1, con_up_loc1]
-
+//---------------- functions ----------------
 var grp1 = "Ichimoku Cloud"
 bool display_ichimoku = input.bool(true, 'Enable Ichimoku Cloud', group = grp1)
-bool display_kijun_arrow = input.bool(true, 'Enable Kijun Arrow', group = grp1)
 bool display_chikou_span = input.bool(true, 'Enable Chikou Span', group = grp1)// Default is off, as it can be messy if otherwise
 bool display_chikou_span_filter_by_kijun = input.bool(false, 'Enable Chikou Span when Kijun-sen changes direction', group = grp1)
 conversionPeriods = input.int(9, minval=1, title='Tenkan-Sen (Conversion Line) Periods')
@@ -68,11 +72,25 @@ cond_up_arrow = _newDirection==1
 
 // I'm using plotchar instead to place arrows above or below Kijunsen, which saves space for other signals
 // plotarrow(_newDirection, title='Kijun Arrow', colorup=color.new(color.black, 50), colordown=color.new(color.black, 50), minheight=15, maxheight=15) 
-plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_kijun_arrow?display.all:display.none)
-plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_kijun_arrow?display.all:display.none)
+plotchar(con_up_arrow_loc, title='Kijun Arrow', char = "⬆", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
+plotchar(con_dn_arrow_loc, title='Kijun Arrow', char = "⬇", location = location.absolute, color =color.new(color.black, 0), size = size.auto, display = display_ichimoku?display.all:display.none)
 plot(_bChikouSpanLn and _newDirection== 1   and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.green, 0), title='Chikou Span Above', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
 plot(_bChikouSpanSt and _newDirection== -1  and display_ichimoku ?close:na, offset=-_displacement, color=color.new(color.red, 0),   title='Chikou Span Below', style=plot.style_linebr, linewidth=8, display = display_chikou_span_filter_by_kijun?display.all:display.none)
-
+// --------------- function --------------- 
+getCloudDirection(__offset) =>
+    if close > math.max(leadLine1[__offset], leadLine2[__offset])
+        1
+    else if close < math.min(leadLine1[__offset], leadLine2[__offset])
+        -1
+    else 
+        0
+getTableCloudColours(cloudSignal, colourUp, colourDn, colourNu) =>
+    if cloudSignal == 1
+        colourUp
+    else if cloudSignal == -1
+        colourDn
+    else
+        colourNu
 //--------------------------------- Multi-timeframe (MTF) Kijun ---------------------------------
 var grp2 = "Multi-timeframe (MTF)"
 bool display_mtk = input.bool(false, 'Enable Multi Timeframe Kijun-sen', group = grp2)
@@ -122,30 +140,95 @@ trValueDaily = request.security(syminfo.tickerid, "1D", trValueCur)
 atrValueCur = math.round_to_mintick(GetCorrectTickValue(atr)) 
 atrValueDaily = request.security(syminfo.tickerid, "1D", atrValueCur)
 
-var string GP2 = "ATR table"
-string  tableYposInput = input.string("top", "Panel position", inline = "11", options = ["top", "middle", "bottom"], group = GP2)
-string  tableXposInput = input.string("right", "", inline = "11", options = ["left", "center", "right"], group = GP2)
-color   bullColorInput = input.color(color.new(color.green, 30), "Bull", inline = "12", group = GP2)
-color   bearColorInput = input.color(color.new(color.red, 30), "Bear", inline = "12", group = GP2)
-color   neutColorInput = input.color(color.new(color.gray, 80), "Neutral", inline = "12", group = GP2)
+var string grp_atr = "ATR Panel"
+string  tableYposInput = input.string("top", "ATR Panel position", inline = "11", options = ["top", "middle", "bottom"], group = grp_atr)
+string  tableXposInput = input.string("right", "", inline = "11", options = ["left", "center", "right"], group = grp_atr)
+color   bullColorInput = input.color(color.new(color.green, 30), "Above", inline = "12", group = grp_atr)
+color   bearColorInput = input.color(color.new(color.red, 30), "Under", inline = "12", group = grp_atr)
+color   neutColorInput = input.color(color.new(color.gray, 80), "Neutral", inline = "12", group = grp_atr)
+
+int cloudSignal_1m = request.security(syminfo.tickerid, "1", getCloudDirection(_displacement))
+int cloudSignal_5m = request.security(syminfo.tickerid, "5", getCloudDirection(_displacement))
+int cloudSignal_15m = request.security(syminfo.tickerid, "15", getCloudDirection(_displacement))
+int cloudSignal_1h = request.security(syminfo.tickerid, "60", getCloudDirection(_displacement))
+int cloudSignal_4h = request.security(syminfo.tickerid, "240", getCloudDirection(_displacement))
+int cloudSignal_1D = request.security(syminfo.tickerid, "D", getCloudDirection(_displacement))
+
+var string grp_cloud = "Cloud Panel"
+string  tableCloudYposInput = input.string("top", "Cloud Panel position", inline = "11", options = ["top", "middle", "bottom"], group = grp_cloud)
+string  tableCloudXposInput = input.string("center", "", inline = "11", options = ["left", "center", "right"], group = grp_cloud)
+color   bullColorCloudInput = input.color(color.new(color.green, 30), "Above Cloud", inline = "12", group = grp_cloud)
+color   bearColorCloudInput = input.color(color.new(color.red, 30), "Below Cloud", inline = "12", group = grp_cloud)
+color   neutColorCloudInput = input.color(color.new(color.gray, 80), "Inside Cloud", inline = "12", group = grp_cloud)
 
 // KijunD = getMidPoint(basePeriodsK, 0)
 // request.security(syminfo.tickerid, "D", pipSizeCalc[1], lookahead=barmerge.lookahead_on)
 
-var table panel = table.new(tableYposInput + "_" + tableXposInput, 3, 3)
+var table panelATR = table.new(tableYposInput + "_" + tableXposInput, 3, 6)
+var table panelCloud = table.new(tableCloudYposInput + "_" + tableCloudXposInput, 12, 2)
+
+// ----------- count candles when are above, below or inside the cloud -----------
+
+getCandleCountsAgainstCloud() =>
+    // Determine if the candle is above, below, or inside the cloud
+    aboveCloud = close > leadLine1[_displacement] and close > leadLine2[_displacement]
+    belowCloud = close < leadLine1[_displacement] and close < leadLine2[_displacement]
+    insideCloud = not aboveCloud and not belowCloud
+
+    // Initialize count variables
+    var int aboveCount = 0
+    var int belowCount = 0
+    var int insideCount = 0
+
+    // Count candles based on cloud position
+    if aboveCloud
+        belowCount := 0
+        insideCount := 0
+        aboveCount := aboveCount + 1
+    else if belowCloud
+        aboveCount := 0
+        insideCount := 0
+        belowCount := belowCount + 1
+    else
+        aboveCloud := 0
+        belowCount := 0
+        insideCount := insideCount + 1
+
+int cloudSignalCandleCount_1m = request.security(syminfo.tickerid, "1", (getCandleCountsAgainstCloud()))
+int cloudSignalCandleCount_5m = request.security(syminfo.tickerid, "5", (getCandleCountsAgainstCloud()))
+int cloudSignalCandleCount_15m = request.security(syminfo.tickerid, "15", (getCandleCountsAgainstCloud()))
+int cloudSignalCandleCount_1h = request.security(syminfo.tickerid, "60", (getCandleCountsAgainstCloud()))
+int cloudSignalCandleCount_4h = request.security(syminfo.tickerid, "240", (getCandleCountsAgainstCloud()))
+int cloudSignalCandleCount_1D = request.security(syminfo.tickerid, "D", (getCandleCountsAgainstCloud()))
+//----------------------------------
+
 
 if barstate.islast
     bgColorCur = trValueCur > atrValueCur ? bearColorInput : bullColorInput
     bgColorDaily = trValueDaily > atrValueDaily ? bearColorInput : bullColorInput
 
     // Table header.
-    table.cell(panel, 0, 0, "Period", bgcolor = neutColorInput)
-    table.cell(panel, 1, 0, "Range", bgcolor = neutColorInput)
-    table.cell(panel, 2, 0, "ATR", bgcolor = neutColorInput)
-    // table.cell(panel, 0, 1, timeframe.period, bgcolor = neutColorInput)
-    // table.cell(panel, 1, 1, str.tostring(trValueCur), bgcolor = bgColorCur)
-    // table.cell(panel, 2, 1, str.tostring(atrValueCur), bgcolor = neutColorInput)
-    table.cell(panel, 0, 2, "D", bgcolor = neutColorInput)
-    table.cell(panel, 1, 2, str.tostring(trValueDaily), bgcolor = bgColorDaily)
-    table.cell(panel, 2, 2, str.tostring(atrValueDaily), bgcolor = neutColorInput)
-    // table.cell(atrDisplay, 0, 0, str.tostring(_existingArrowDirection))
+    // table.cell(panelATR, 0, 0, "Period", bgcolor = neutColorInput)
+    table.cell(panelATR, 1, 0, "Range", bgcolor = neutColorInput)
+    table.cell(panelATR, 2, 0, "ATR", bgcolor = neutColorInput)
+    // table.cell(panelATR, 0, 1, timeframe.period, bgcolor = neutColorInput)
+    // table.cell(panelATR, 1, 1, str.tostring(trValueCur), bgcolor = bgColorCur)
+    // table.cell(panelATR, 2, 1, str.tostring(atrValueCur), bgcolor = neutColorInput)
+    // table.cell(panelATR, 0, 2, "D", bgcolor = neutColorInput)
+    table.cell(panelATR, 1, 2, str.tostring(trValueDaily), bgcolor = bgColorDaily)
+    table.cell(panelATR, 2, 2, str.tostring(atrValueDaily), bgcolor = neutColorInput)
+
+    table.cell(panelCloud, 0, 0, "1m", bgcolor = neutColorInput)
+    table.cell(panelCloud, 1, 0, "5m", bgcolor = neutColorInput)
+    table.cell(panelCloud, 2, 0, "15m", bgcolor = neutColorInput)
+    table.cell(panelCloud, 3, 0, "1h", bgcolor = neutColorInput)
+    table.cell(panelCloud, 4, 0, "4h", bgcolor = neutColorInput)
+    table.cell(panelCloud, 5, 0, "D", bgcolor = neutColorInput)
+    table.cell(panelCloud, 0, 1, str.tostring(cloudSignalCandleCount_1m), bgcolor = getTableCloudColours(cloudSignal_1m, color.green, color.red, color.gray))
+    table.cell(panelCloud, 1, 1, str.tostring(cloudSignalCandleCount_5m), bgcolor = getTableCloudColours(cloudSignal_5m, color.green, color.red, color.gray))
+    table.cell(panelCloud, 2, 1, str.tostring(cloudSignalCandleCount_15m), bgcolor = getTableCloudColours(cloudSignal_15m, color.green, color.red, color.gray))
+    table.cell(panelCloud, 3, 1, str.tostring(cloudSignalCandleCount_1h), bgcolor = getTableCloudColours(cloudSignal_1h, color.green, color.red, color.gray))
+    table.cell(panelCloud, 4, 1, str.tostring(cloudSignalCandleCount_4h), bgcolor = getTableCloudColours(cloudSignal_4h, color.green, color.red, color.gray))
+    table.cell(panelCloud, 5, 1, str.tostring(cloudSignalCandleCount_1D), bgcolor = getTableCloudColours(cloudSignal_1D, color.green, color.red, color.gray))
+
+    // table.cell(panelATR, 0, 0, str.tostring(_existingArrowDirection))
