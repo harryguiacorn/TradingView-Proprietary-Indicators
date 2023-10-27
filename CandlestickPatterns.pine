@@ -262,13 +262,16 @@ plotshape(con_hhll_dn_loc, 'downwards',   style = shape.arrowdown,    location =
 plotshape(con_hhll_up_loc, 'upwards',     style = shape.arrowup,      location = location.absolute, size = size.auto, color = color.new(color.green, 50), display = enableHHLL?display.all:display.data_window)
 
 //---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
+//---------------------- ATR Warning Indicator ----------------------//
 enableATR_warning      = input.bool(false, "Enable ATR Warning Indicator", group = "7. ATR Warning") // true
+int __atrWarning = input.int(14, "ATR", step = 1, group = "7. ATR Warning")
+
 atr_current_bar = ta.atr(1)
-atr_cond_over = atr_current_bar >= atr
-atr_cond_uder = atr_current_bar < atr
+atr_cond_over = atr_current_bar >= __atrWarning
+atr_cond_uder = atr_current_bar < __atrWarning
 plotshape(atr_cond_over, "Over ATR", style = shape.circle, location = location.bottom, color = color.new(color.black, 0), display = enableATR_warning?display.all:display.none)
 plotshape(atr_cond_uder, "Under ATR", style = shape.circle, location = location.bottom, color = color.new(color.silver, (1-atr_current_bar/atr)*100), display = enableATR_warning?display.all:display.none)
-//---------------------- Candlestick Higher Highs and Lower Lows ----------------------//
+//---------------------- ATR Warning Indicator ----------------------//
 
 //---------------------- Tom's 4 bar fractal ----------------------//
 bool enable4barf = input.bool(true, "Enable 4-Bar Fractalr", group = "8. 4-Bar Fractal - Tom Hougaard")
