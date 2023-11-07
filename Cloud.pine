@@ -70,10 +70,8 @@ fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 95) : color.ne
 //Alert for Tenkan-sen and Kijun-sen crosses
 alert_tk_cross_up = ta.crossover(conversionLine, baseLine)
 alert_tk_cross_dn = ta.crossunder(conversionLine, baseLine)
-alertcondition(condition=alert_tk_cross_up,
-     message="TK cross up: {{ticker}} {{interval}} {{time}}" )
-alertcondition(condition=alert_tk_cross_dn,
-     message="TK cross down: {{ticker}} {{interval}} {{time}}" )
+alertcondition(condition=alert_tk_cross_up or alert_tk_cross_dn,
+     message="TK cross: {{ticker}} {{interval}} {{time}}" )
 // if alert_tk_cross_up
 //     alert("TK cross up: {{ticker}} {{interval}} {{time}}", alert.freq_once_per_bar_close)
 // else if alert_tk_cross_dn
