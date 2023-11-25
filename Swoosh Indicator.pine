@@ -1,0 +1,89 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader - Harry Gui
+
+//@version=5
+indicator(title="Swoosh Indicator", overlay=true)
+
+// Inputs
+var grp1 = "Moving Averages"
+bool display_ma = input.bool(false, 'Display Moving Averages', group = grp1)
+averageData = input.source(close, title="Average Data Source", group = grp1)
+
+// SMA inputs can be set by the user
+l_sma_line_1 = input.int(5, title="SMA 1", inline = "ma_1", group = grp1)
+l_sma_line_2 = input.int(10, title="SMA 2", inline = "ma_1", group = grp1)
+l_sma_line_3 = input.int(50, title="SMA 3", inline = "ma_2", group = grp1)
+l_sma_line_4 = input.int(100, title="SMA 4", inline = "ma_2", group = grp1)
+
+// Calculate SMAs 
+sma_5 = ta.sma(averageData, l_sma_line_1)
+sma_20 = ta.sma(averageData, l_sma_line_2)
+sma_50 = ta.sma(averageData, l_sma_line_3)
+sma_100 = ta.sma(averageData, l_sma_line_4)
+
+// Plot SMAs on chart if display setting is on
+plot(sma_5, color=color.blue, title="SMA 5", linewidth = 2, display = display_ma?display.all:display.none)
+plot(sma_20, color=color.green, title="SMA 20", linewidth = 2, display = display_ma?display.all:display.none)
+plot(sma_50, color=color.red, title="SMA 50", linewidth = 2, display = display_ma?display.all:display.none)
+plot(sma_100, color=color.black, title="SMA 100", linewidth = 2, display = display_ma?display.all:display.none)
+
+// If the SMAs are stacked up in the right order, i.e. sma 5 is above sma 20 and sma 20 is above 50 while sma 50 is above 100, then they're stacked in the right order
+sma_stacked_up = sma_5 > sma_20 and sma_20 > sma_50 and sma_50 > sma_100
+sma_stacked_dn = sma_5 < sma_20 and sma_20 < sma_50 and sma_50 < sma_100
+
+[macdLine, signalLine, histLine] = ta.macd(close, 12, 26, 9)
+macd_up = macdLine > signalLine
+macd_dn = macdLine < signalLine
+
+// plot(macdLine, color=color.blue)
+// plot(signalLine, color=color.orange)
+// plot(histLine, color=color.red, style=plot.style_histogram)
+
+// Vortex Indicator https://www.investopedia.com/terms/v/vortex-indicator-vi.asp
+bool enable_vortex = input.bool(false, 'Enable Vortex Indicator', inline = "Vortex_1", group = "Vortex")
+// showVortexInput   = input.bool(false, "Display Vortex",   inline = "Vortex1", group = "Vortex")
+period_ = input.int(14, title="Length", minval=2, inline = "Vortex_2", group = "Vortex")
+vi_band_up = input.float(1.05, title="Upper band", inline = "Vortex3", group = "Vortex", step = 0.01)
+vi_band_dn = input.float(0.95, title="Lower band", inline = "Vortex3", group = "Vortex", step = 0.01)
+VMP = math.sum( math.abs( high - low[1]), period_ )
+VMM = math.sum( math.abs( low - high[1]), period_ )
+STR = math.sum( ta.atr(1), period_ )
+VIP = VMP / STR
+VIM = VMM / STR
+// plot(VIP, title="VI +", color=#2962FF)
+// plot(VIM, title="VI -", color=#E91E63)
+VI_up = VIP > VIM and VIP > vi_band_up
+VI_dn = VIP < VIM and VIM < vi_band_dn
+// cond_VI_up = enable_vortex?VI_up:false
+// cond_VI_dn = enable_vortex?VI_dn:false
+
+bool cond_VI_up = if enable_vortex and VI_up
+    true
+bool cond_VI_dn = if enable_vortex and VI_dn
+    true
+
+cond_arrow_up = if sma_stacked_up and macd_up and enable_vortex and cond_VI_up
+    true
+else if sma_stacked_up and macd_up
+    true
+else 
+    false
+
+plotshape(cond_arrow_up, color = color.green, style=shape.arrowup, location = location.belowbar)
+plotshape(sma_stacked_dn and macd_dn, color = color.red, style=shape.arrowdown, location = location.abovebar)
+
+signal_valid = if sma_stacked_up and macd_up
+    color.new(color.green, 70)
+else if sma_stacked_dn and macd_dn
+    color.new(color.red, 70)
+// else 
+//     color.new(color.gray, 70)
+
+signal_valid_1 = if sma_stacked_up and macd_up and enable_vortex and cond_VI_up
+    color.new(color.green, 70)
+else if sma_stacked_dn and macd_dn and enable_vortex and cond_VI_dn
+    color.new(color.red, 70)
+// else 
+//     color.new(color.gray, 70)
+// bgcolor(signal_valid, title="Crosses Background")
+// bgcolor(signal_valid_1, title="Crosses Background")
