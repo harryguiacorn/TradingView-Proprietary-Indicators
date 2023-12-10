@@ -280,10 +280,15 @@ var table panelATR = table.new(tableYposInput + "_" + tableXposInput, 4, 6)
 // __cloud__span_a_1d = __leadLine1_1d[1]
 // __cloud__span_b_1d = request.security(syminfo.tickerid, "D", __leadLine2_4h[_displacement])
 
-
 if barstate.islast
     bgColorCur = trValueCur > atrValueCur ? bearColorInput : bullColorInput
     bgColorDaily = trValueDaily > atrValueDaily ? bearColorInput : bullColorInput
+    bgColorTKx = if con_tk_current > 0 
+        bullColorInput
+    else if con_tk_current < 0
+        bearColorInput
+    else
+        color.new(color.gray, 50)
 
     // table.cell(panelCloud, 0, 0, "1m", bgcolor = neutColorInput)
     // table.cell(panelCloud, 1, 0, "5m", bgcolor = neutColorInput)
@@ -310,7 +315,7 @@ if barstate.islast
     // table.cell(panelATR, 0, 2, "D", bgcolor = neutColorInput)
     table.cell(panelATR, 1, 2, str.tostring(trValueDaily), bgcolor = bgColorDaily)
     table.cell(panelATR, 2, 2, str.tostring(atrValueDaily), bgcolor = neutColorInput)
-    table.cell(panelATR, 3, 2, str.tostring(con_tk_current), bgcolor = neutColorInput)
+    table.cell(panelATR, 3, 2, str.tostring(con_tk_current), bgcolor = bgColorTKx)
     
     // table.cell(panelATR, 0, 3, str.tostring(__cloud__span_a_4h), bgcolor = neutColorInput)
     // table.cell(panelATR, 1, 3, str.tostring(__cloud__span_a_1d), bgcolor = neutColorInput)
