@@ -1,12 +1,19 @@
 # TradingView
 ## Language - Pine script ##
 
-![BRK B_2022-10-25_12-34-26](https://user-images.githubusercontent.com/1398153/197763143-523ed510-b02b-4715-bea4-472ceb90acdc.png)
+### Tenkan-sen and Kijun-sen crosses ### 
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/22c72528-15b6-4488-bbbf-ee1b90b1e1f9)
+* The Tenkan-sen (conversion line) and Kijun-sen (base line) indicate price momentum and potential trend changes. A Tenkan-sen crossover above Kijun-sen within the cloud suggests a medium-strength upward signal. Above the cloud, the signal strengthens, and below it, weakens.
+* The TKx value in the top right panel shows the number of periods since the Tenkan-sen and Kijun-sen last crossed, which can provide an indication of the trend's strength and potential continuation.
+* The top right panel shows the timeframe of the most recent crossovers for reference. Additionally, the current daily range compared to the Average True Range (ATR) can provide insights into momentum strength. An unusually large daily range compared to the ATR can indicate weakening momentum and potentially less fuel for the trend to continue.
 
 ### Kijun Arrow ###
-This indicator places an arrow below or above the candlestick when the Kijun-sen changes direction. The remaining elements use standard Ichimoku Cloud settings.
+This indicator places an arrow below or above the candlestick when the Kijun-sen changes direction. The remaining elements use standard Ichimoku Cloud settings. (see chart below)
+
+![BRK B_2022-10-25_12-34-26](https://user-images.githubusercontent.com/1398153/197763143-523ed510-b02b-4715-bea4-472ceb90acdc.png)
+
 ### Quantity Quality Commitment (QQC) ###
-The QQC aims to assess the underlying strength of momentum by examining three metrics: quantity, quality, and commitment.
+The QQC aims to assess the underlying strength of momentum by examining three metrics: quantity, quality, and commitment. (see chart above)
 * **Quantity**: This metric counts the number of bullish versus bearish candlesticks over defined periods.
 * **Quality**: It measures the quality of bullishness versus bearishness in the candlesticks over defined periods. For example, if a bullish candlestick has minimal wicks, it indicates that the bulls maintained control from beginning to end, resulting in a high score for the bullish tally.
 * **Commitment**: The previous two metrics can provide a false sense of direction if there is little volume. A lack of volume can lead to unstable momentum. Therefore, this element incorporates volume to provide a comprehensive view from three perspectives.
