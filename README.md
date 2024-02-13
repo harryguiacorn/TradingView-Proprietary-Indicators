@@ -27,8 +27,9 @@ The QQC aims to assess the underlying strength of momentum by examining three me
 ![SPX_2022-11-07_22-19-19](https://user-images.githubusercontent.com/1398153/200427563-f9629a58-97ab-4848-aea4-00651c1cfc9e.png)
 * HOLP stands for **H**igh **O**f the **L**ow **P**eriod
 * LOHP stands for **L**ow **O**f the **H**igh **P**eriod
-* This indicator is based on John Carter's HOLP and LOHP from "Mastering the Trade." The fundamental concept is to identify the session's high and mark the low of the session high for a short entry, and vice versa for a long entry.
-* The default lookback period is set to 10 here, although John Carter didn't specify a hard-coded number but rather recommended using experience and common sense.
+* HOLP and LOHP are indicators based on concepts developed by John Carter in his book, "Mastering the Trade." Their purpose is to identify potential reversal points in a trading session.
+* The fundamental concept is to identify the session's high and mark the low of the session high for a short entry, and vice versa for a long entry.
+* The default lookback period is set to 10 in this indicator, but John Carter emphasized using experience and common sense rather than relying solely on a fixed number.
 
 ### Candlestick Kicker Pattern ###
 ![AMZN_2022-11-11_16-15-14](https://user-images.githubusercontent.com/1398153/201383575-4ae922dd-eba4-40b6-a096-4d113349c1f9.png)
