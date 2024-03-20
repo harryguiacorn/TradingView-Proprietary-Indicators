@@ -45,7 +45,11 @@ The downward signal is the opposite of the upward signal.
 An inside bar pattern is a two-bar scenario in which the range of the second bar is contained within the range of the preceding one. This pattern typically occurs when market volatility is diminishing, and it often precedes an expansion in the price range, resulting in a breakout. A signal will be generated above or below the breakout candle when these conditions are met.
 
 ## Candlestick Engulfing Pattern ##
-![image](https://github.com/harryguiacorn/tradingview/assets/1398153/5f2d68cf-478d-488c-b3e5-b1274c1ed882)
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/5084b31c-b4fe-448b-8c97-12d82fbc6538)
+
+### Setting Panel ###
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/76eb0230-80ad-4088-96f4-f75fd76a0bd6)
+
 This is a classic candlestick pattern that serves as a warning that the current trend may have come to an end or is pausing. In a bullish setup, the body of the second candle completely engulfs the body of the previous candle, and vice versa. There are options available for filtering based on the ratio of body size to the overall range for both candles.
 
 ## ATR warning ##
