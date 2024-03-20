@@ -1,7 +1,7 @@
 # TradingView - Pine script #
 
 ## Cloud Legend ##
-### TK crosses period ###
+### TK Crosses Period ###
 ![image](https://github.com/harryguiacorn/tradingview/assets/1398153/22c72528-15b6-4488-bbbf-ee1b90b1e1f9)
 * The Tenkan-sen (conversion line) and Kijun-sen (base line) indicate price momentum and potential trend changes. A Tenkan-sen crossover above Kijun-sen within the cloud suggests a medium-strength upward signal. Above the cloud, the signal strengthens, and below it, weakens.
 * The TKx value in the top right panel shows the number of periods since the Tenkan-sen and Kijun-sen last crossed, which can provide an indication of the trend's strength and potential continuation.
@@ -41,7 +41,11 @@ An upward signal is generated when you have a two-bar formation. The left candle
 The downward signal is the opposite of the upward signal.
 
 ## Candlestick Inside Bar Pattern ##
-![image](https://github.com/harryguiacorn/tradingview/assets/1398153/dfa6e3e5-5b67-4e6e-bce3-bd174b76182b)
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/b9e1644c-74e0-4912-98dd-976b31989b60)
+
+### Setting Panel ###
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/7f1dad72-c15f-4a7e-ad12-5d8216d53d4e)
+
 An inside bar pattern is a two-bar scenario in which the range of the second bar is contained within the range of the preceding one. This pattern typically occurs when market volatility is diminishing, and it often precedes an expansion in the price range, resulting in a breakout. A signal will be generated above or below the breakout candle when these conditions are met.
 
 ## Candlestick Engulfing Pattern ##
