@@ -36,7 +36,10 @@ The QQC aims to assess the underlying strength of momentum by examining three me
 * The default lookback period is set to 10 in this indicator, but John Carter emphasized using experience and common sense rather than relying solely on a fixed number.
 
 ## Candlestick Kicker Pattern ##
-![AMZN_2022-11-11_16-15-14](https://user-images.githubusercontent.com/1398153/201383575-4ae922dd-eba4-40b6-a096-4d113349c1f9.png)
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/70af4b7f-000a-4424-be02-3bb274ee4498)
+
+### Setting Panel ###
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/af30c867-5442-4651-b5ec-7dfc70725856)
 
 Few candlestick patterns inflict more pain on traders on the other side of the trade than this signal. When it occurs, think of it as a swift kick to the teeth; the pain is very real.
 
