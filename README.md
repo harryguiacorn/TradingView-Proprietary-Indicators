@@ -24,7 +24,11 @@ The QQC aims to assess the underlying strength of momentum by examining three me
 * ADX is a tool for assessing the trendiness of a market. If the ADX is below 20, it indicates that recent price action has been choppy, and this is represented by grey bars in the histogram. However, if the ADX is above 20, the bars are coloured orange.
 
 ## HOLP-LOHP ##
-![SPX_2022-11-07_22-19-19](https://user-images.githubusercontent.com/1398153/200427563-f9629a58-97ab-4848-aea4-00651c1cfc9e.png)
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/e9058a44-796b-4e56-a19f-188f74bd4a03)
+
+### Setting Panel ###
+![image](https://github.com/harryguiacorn/tradingview/assets/1398153/993e143a-179a-4df2-b1b3-28963eedb579)
+
 * HOLP stands for **H**igh **O**f the **L**ow **P**eriod
 * LOHP stands for **L**ow **O**f the **H**igh **P**eriod
 * HOLP and LOHP are indicators based on concepts developed by John Carter in his book, "Mastering the Trade." Their purpose is to identify potential reversal points in a trading session.
