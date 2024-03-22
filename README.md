@@ -19,7 +19,7 @@ The QQC aims to assess the underlying strength of momentum by examining three me
 * **Commitment**: The previous two metrics can provide a false sense of direction if there is little volume. A lack of volume can lead to unstable momentum. Therefore, this element incorporates volume to provide a comprehensive view from three perspectives.
 * **ADX**:  If the ADX is above 20, the market is considered to be in a trending environment. Otherwise, it's not in a trend, and price action is likely to be choppy. This indicator is presented in histogram format.
 
-## ADX-Hist ##
+## ADX-Histogram ##
 ![SPX_2022-11-07_21-32-38](https://user-images.githubusercontent.com/1398153/200420661-bf515be5-ee95-4ed1-bc74-687c7b496956.png)
 * ADX is a tool for assessing the trendiness of a market. If the ADX is below 20, it indicates that recent price action has been choppy, and this is represented by grey bars in the histogram. However, if the ADX is above 20, the bars are coloured orange.
 
