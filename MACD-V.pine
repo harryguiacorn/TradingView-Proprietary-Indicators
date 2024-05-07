@@ -1,0 +1,26 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// @ Paper by Alex Spiroglou
+// © Coded by Harry Gui
+
+//@version=5
+indicator("MACD-V", overlay=true)
+
+// Input parameters
+fastLength = input(12, title="Fast EMA Length")
+slowLength = input(26, title="Slow EMA Length")
+signalLength = input(9, title="Signal Length")
+atrLength = input(14, title="ATR Length")
+
+// Calculate ATR
+atr = ta.atr(atrLength)
+
+[macdLine, signalLine, histLine] = ta.macd(close, fastLength, slowLength, signalLength)
+// plot(macdLine/atr, color=color.blue)
+// plot(signalLine/atr, color=color.orange)
+macdv = histLine/atr
+
+plot(macdv, title = "Histogram", style = plot.style_columns, color = (macdv >= 0 ? (macdv[1] < macdv ? #26A69A : #B2DFDB) : (macdv[1] < macdv ? #FFCDD2 : #FF5252)))
+
+hline(0, title = "0.0")
+hline(0.3, title = "0.3")
+hline(-0.3, title = "-0.3")
