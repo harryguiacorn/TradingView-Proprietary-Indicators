@@ -9,7 +9,9 @@ indicator("MACD-V", overlay=true)
 fastLength = input(12, title="Fast EMA Length")
 slowLength = input(26, title="Slow EMA Length")
 signalLength = input(9, title="Signal Length")
-atrLength = input(14, title="ATR Length")
+atrLength = input(26, title="ATR Length")
+overbought = input(40, title="Overbought")
+oversold = input(-40, title="Oversold")
 
 // Calculate ATR
 atr = ta.atr(atrLength)
@@ -17,10 +19,10 @@ atr = ta.atr(atrLength)
 [macdLine, signalLine, histLine] = ta.macd(close, fastLength, slowLength, signalLength)
 // plot(macdLine/atr, color=color.blue)
 // plot(signalLine/atr, color=color.orange)
-macdv = histLine/atr
+macdv = histLine/atr*100
 
 plot(macdv, title = "Histogram", style = plot.style_columns, color = (macdv >= 0 ? (macdv[1] < macdv ? #26A69A : #B2DFDB) : (macdv[1] < macdv ? #FFCDD2 : #FF5252)))
 
 hline(0, title = "0.0")
-hline(0.3, title = "0.3")
-hline(-0.3, title = "-0.3")
+hline(overbought, title = "Overbought")
+hline(oversold, title = "Oversold")
