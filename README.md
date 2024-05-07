@@ -7,6 +7,13 @@
 * The TKx value in the top right panel shows the number of periods since the Tenkan-sen and Kijun-sen last crossed, which can provide an indication of the trend's strength and potential continuation.
 * The top right panel shows the timeframe of the most recent crossovers for reference. Additionally, the current daily range compared to the Average True Range (ATR) can provide insights into momentum strength. An unusually large daily range compared to the ATR can indicate weakening momentum and potentially less fuel for the trend to continue.
 
+## MACD-V: Volatility Normalised Momentum ##
+* **Tutorial** (https://school.stockcharts.com/doku.php?id=technical_indicators:macd-v_histogram)
+* **Paper SSRN** (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4099617)
+* **Papper PDF** (https://www.naaim.org/wp-content/uploads/2022/05/MACD-V-Alex-Spiroglou-WEB.pdf)
+
+![image](https://github.com/harryguiacorn/TradingView-Proprietary-Indicators/assets/1398153/c778b2de-6660-490e-8127-7ecf9bfddfc0)
+
 ## Kijun Arrow ##
 This indicator places an arrow below or above the candlestick when the Kijun-sen changes direction. The remaining elements use standard Ichimoku Cloud settings. (see chart below)
 
