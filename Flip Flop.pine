@@ -1,0 +1,173 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+
+//@version=5
+indicator(title="Flip Flop", shorttitle="Flip Flop", overlay=true, precision = 0)
+lookbackInput = input.int(10, "Lookback in bars", minval = 1, maxval = 4999)
+
+isBullish(i) =>
+    close[i] > open[i]
+
+    
+// higherBars = 0
+// lowerBars = 0
+
+
+// if barstate.islast
+//     var label lbl = label.new(na, na, "", style = label.style_label_left)
+//     for i = 1 to lookbackInput
+//         if high > high[i] and isBullish(i-1)
+//             higherBars += 1
+//         else if high[i] < high
+//             lowerBars += 1
+//     label.set_xy(lbl, bar_index, high)
+//     label.set_text(lbl, str.tostring(higherBars, "# higher bars\n") + str.tostring(lowerBars, "# lower bars"))
+
+
+
+
+var candle_highs = array.new_float(lookbackInput)
+var candle_lows = array.new_float(lookbackInput)
+
+var int index_highest_bull = na
+var float value_highest_bull = na
+var float value_low_of_highest_bull = na
+
+
+
+if barstate.islast
+    // var label lbl = label.new(na, na, "", style = label.style_label_left)
+    // label.set_xy(lbl, bar_index, high)
+    // label.set_text(lbl, str.tostring("# higher bars\n") + str.tostring("# lower bars"))
+
+    //@variable A string containing the size of `a` and the current `bar_index` value.
+    string labelText = "Array size: " + str.tostring(candle_highs.size()) + "\nbar_index: " + str.tostring(bar_index)
+
+    for i = lookbackInput to 1 by 1
+        array.set(candle_highs, i-1, high[i])
+        array.set(candle_lows, i-1, low[i])
+
+        if isBullish(i) 
+            if na(value_highest_bull)
+                value_highest_bull := array.get(candle_highs, i-1)
+                index_highest_bull := i
+            else if array.get(candle_highs, i-1) > value_highest_bull
+                value_highest_bull := array.get(candle_highs, i-1)
+                index_highest_bull := i
+
+        value_low_of_highest_bull := low[index_highest_bull]
+        if close[i] < value_low_of_highest_bull and index_highest_bull > i
+            label.new(bar_index-i, high[i], yloc = yloc.abovebar)
+
+
+            // display labels for testing
+            // label lbl_array  = label.new(bar_index, 0, labelText, size = size.auto)
+            // label.set_xy(lbl_array, bar_index-i, high[i])
+            // labelText := "Array size: " + str.tostring(candle_highs.size()) + "\nbar_index: " + str.tostring(i)
+            // label.set_text(lbl_array, labelText)
+
+    var label lbl_array  = label.new(bar_index-index_highest_bull, high[index_highest_bull], str.tostring(index_highest_bull) + "::" +str.tostring(array.get(candle_lows,index_highest_bull-1)) , size = size.auto, style = label.style_label_up)
+    label.set_xy(lbl_array, bar_index-index_highest_bull, low[index_highest_bull])
+    // label.set_xloc(lbl_array, xloc.bar_index-index_highest_bull)
+    label.set_yloc(lbl_array, yloc.belowbar)
+
+
+// // Find the highest bullish bar from the array
+// maxhighestBullishBar = array.max(candle_highs)
+// // Plot the highest bullish bar
+// plot(maxhighestBullishBar, "Highest Bullish Bar", color=color.green)
+    
+
+
+
+
+
+
+//----------------------------------------------------------------------------
+// // Method for Ploting Highest High Set By Bullish Bars
+
+// // Initialize the variable to store the highest bullish bar high
+// var float highestBullishBarHigh = na
+// var float highestBullishBar = na
+
+// // Update the highest bullish bar high if the current bar is bullish
+// // if isBullish(0)
+// highestBullishBar := ta.highestbars(high, lookbackInput)
+// highestBullishBarHigh :=  ta.highest(high, lookbackInput)
+    
+// // Plot the highest bullish bar
+// plot(highestBullishBarHigh, "Highest Bullish Bar", color=color.blue)
+// // plotarrow(highestBullishBar)
+
+// // End of Method
+
+
+
+// // Method 2
+// // Function to check if the bar is bullish
+
+// // Define the array to store bullish bars' highs
+// var float[] bullishBarsHighs = array.new_float(0)
+
+// // Length of the array (number of bars to store)
+// arrayLength = input(10, "Number of Bullish Bars to Store")
+
+// // Main script logic
+// if isBullish(0)
+//     // Add the high of the current bullish bar to the array
+//     array.push(bullishBarsHighs, high)
+//     // Keep the array size to the defined length
+//     if array.size(bullishBarsHighs) > arrayLength
+//         array.shift(bullishBarsHighs)
+
+// // Find the highest bullish bar from the array
+// maxhighestBullishBar = array.max(bullishBarsHighs)
+
+// // Plot the highest bullish bar
+// plot(maxhighestBullishBar, "Highest Bullish Bar", color=color.green)
+
+// // Debugging: Uncomment the line below to see the array contents on the chart
+// // plotchar(array.get(bullishBarsHighs, 0), "Last Bullish Bar High", location=location.top)
+
+// // End of Method 2
+
+
+
+// Method 3
+
+// // Function to check if the bar is bullish
+// isBullish() =>
+//     close > open
+
+// // Define the arrays to store bullish bars' highs and lows
+// var float[] bullishBarsHighs = array.new_float(0)
+// var float[] bullishBarsLows = array.new_float(0)
+
+// // Length of the array (number of bars to store)
+// arrayLength = input(10, "Number of Bullish Bars to Store")
+
+// // Main script logic
+// if isBullish()
+//     // Add the high and low of the current bullish bar to the arrays
+//     array.push(bullishBarsHighs, high)
+//     array.push(bullishBarsLows, low)
+//     // Keep the array size to the defined length
+//     if array.size(bullishBarsHighs) > arrayLength
+//         array.shift(bullishBarsHighs)
+//         array.shift(bullishBarsLows)
+
+// // Find the index of the highest bullish bar
+// indexHighestBullishBar = array.indexof(bullishBarsHighs, array.max(bullishBarsHighs))
+
+// // Retrieve the low of the highest bullish bar
+// lowOfHighestBullishBar = array.get(bullishBarsLows, indexHighestBullishBar)
+
+// // Plot the low of the highest bullish bar
+// plot(indexHighestBullishBar, "Low of Highest Bullish Bar", color=color.yellow)
+
+// // Debugging: Uncomment the line below to see the array contents on the chart
+// // plotchar(array.get(bullishBarsLows, 0), "Last Bullish Bar Low", location=location.bottom)
+
+
+// End of Method 3
+
