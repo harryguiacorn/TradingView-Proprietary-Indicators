@@ -36,21 +36,28 @@ if barstate.islast
         // if i == 0
 
         if isBullish(i) 
-            // To put consecutive bullish highs and lows into their perspective arrays 
-            array.set(candle_bull_bar_highs, i-offset_position, high[i])
-            array.set(candle_bull_bar_lows, i-offset_position, low[i])
             
             // To set the first high from the first bull bar from the beginning of the array or series
             if na(value_highest_bull)
+                // To put consecutive bullish highs and lows into their perspective arrays 
                 array.set(candle_bull_bar_highs, i-offset_position, high[i])
+                array.set(candle_bull_bar_lows, i-offset_position, low[i])
+
                 value_highest_bull := high[i]
                 index_highest_bull := i
 
             // Once a new high is set, populate it to the next element in the array, until a new high occurs. 
-            if array.get(candle_highs, i-offset_position) > array.max(candle_bull_bar_highs)
+            if high[i] > array.max(candle_bull_bar_highs)
+                // To put consecutive bullish highs and lows into their perspective arrays 
                 array.set(candle_bull_bar_highs, i-offset_position, high[i])
-                value_highest_bull := high[i]    
+                array.set(candle_bull_bar_lows, i-offset_position, low[i])
+                
+                // array.set(candle_bull_bar_highs, i-offset_position, high[i])
+                // value_highest_bull := high[i]    
                 index_highest_bull := i
+            // else
+            //     value_highest_bull := high[i]    
+
             
 
             // if na(value_highest_bull)
@@ -72,7 +79,7 @@ if barstate.islast
         label lbl_array  = label.new(bar_index, 0, labelText, size = size.normal, style = label.style_label_up)
         label.set_xy(lbl_array, bar_index - i, high)
         label.set_yloc(lbl_array, yloc = yloc.belowbar)
-        labelText := "Array: " + str.tostring(candle_highs.size()) + "\nindex: " + str.tostring(index_highest_bull) + "\nhigh:" + str.tostring(array.get(candle_bull_bar_highs,index_highest_bull)) + "\nmax:" + str.tostring(array.max(candle_bull_bar_highs))
+        labelText := "Array: " + str.tostring(candle_highs.size()) + "\nindex: " + str.tostring(index_highest_bull) + "\nhigh bar:" + str.tostring(array.get(candle_bull_bar_highs,index_highest_bull)) + "\nhigh:" + str.tostring(high[i]) + "\nmax:" + str.tostring(array.max(candle_bull_bar_highs))
         label.set_text(lbl_array, labelText)
 
         // // labels for subsequent closes below the low of the highest bull bar
