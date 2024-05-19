@@ -4,102 +4,112 @@
 //@version=5
 indicator(title="Flip Flop", shorttitle="Flip Flop", overlay=true, precision = 0)
 lookbackInput = input.int(10, "Lookback in bars", minval = 1, maxval = 4999)
+display_low_of_highest_bull_bar = input(true,"display_low_of_highest_bull_bar")
 
 isBullish(i) =>
     close[i] > open[i]
 
-    
-// higherBars = 0
-// lowerBars = 0
+isBearish(i) =>
+    close[i] < open[i]
 
+candle_highs = array.new_float(lookbackInput)
+candle_lows = array.new_float(lookbackInput)
+candle_bull_bar_highs = array.new_float(lookbackInput)
+candle_bull_bar_lows = array.new_float(lookbackInput)
 
-// if barstate.islast
-//     var label lbl = label.new(na, na, "", style = label.style_label_left)
-//     for i = 1 to lookbackInput
-//         if high > high[i] and isBullish(i-1)
-//             higherBars += 1
-//         else if high[i] < high
-//             lowerBars += 1
-//     label.set_xy(lbl, bar_index, high)
-//     label.set_text(lbl, str.tostring(higherBars, "# higher bars\n") + str.tostring(lowerBars, "# lower bars"))
-
-
-
-
-var candle_highs = array.new_float(lookbackInput)
-var candle_lows = array.new_float(lookbackInput)
-
+var int index_highest_bull_count_from_left = na
 var int index_highest_bull = na
 var float value_highest_bull = na
 var float value_low_of_highest_bull = na
 
-
-
 if barstate.islast
-    // var label lbl = label.new(na, na, "", style = label.style_label_left)
-    // label.set_xy(lbl, bar_index, high)
-    // label.set_text(lbl, str.tostring("# higher bars\n") + str.tostring("# lower bars"))
-
     //@variable A string containing the size of `a` and the current `bar_index` value.
     string labelText = "Array size: " + str.tostring(candle_highs.size()) + "\nbar_index: " + str.tostring(bar_index)
 
-    for i = lookbackInput to 1 by 1
-        array.set(candle_highs, i-1, high[i])
-        array.set(candle_lows, i-1, low[i])
+    var int offset_position = 0
+    var int offset_lookback = 1
+
+    for i = lookbackInput-1 to 0 by 1
+        // To put consecutive highs and lows into their perspective arrays 
+        array.set(candle_highs, i-offset_position, high[i])
+        array.set(candle_lows, i-offset_position, low[i])
+        // if i == 0
 
         if isBullish(i) 
+            // To put consecutive bullish highs and lows into their perspective arrays 
+            array.set(candle_bull_bar_highs, i-offset_position, high[i])
+            array.set(candle_bull_bar_lows, i-offset_position, low[i])
+            
+            // To set the first high from the first bull bar from the beginning of the array or series
             if na(value_highest_bull)
-                value_highest_bull := array.get(candle_highs, i-1)
-                index_highest_bull := i
-            else if array.get(candle_highs, i-1) > value_highest_bull
-                value_highest_bull := array.get(candle_highs, i-1)
+                array.set(candle_bull_bar_highs, i-offset_position, high[i])
+                value_highest_bull := high[i]
                 index_highest_bull := i
 
-        value_low_of_highest_bull := low[index_highest_bull]
-        if close[i] < value_low_of_highest_bull and index_highest_bull > i
-            label.new(bar_index-i, high[i], yloc = yloc.abovebar)
+            // Once a new high is set, populate it to the next element in the array, until a new high occurs. 
+            if array.get(candle_highs, i-offset_position) > array.max(candle_bull_bar_highs)
+                array.set(candle_bull_bar_highs, i-offset_position, high[i])
+                value_highest_bull := high[i]    
+                index_highest_bull := i
+            
+
+            // if na(value_highest_bull)
+            //     value_highest_bull := array.get(candle_highs, i-offset_position)
+            //     index_highest_bull_count_from_left := i - offset_position
+            // else if array.get(candle_highs, i-offset_position) > value_highest_bull
+            //     value_highest_bull := array.get(candle_highs, i-offset_position)
+            //     index_highest_bull_count_from_left := i - offset_position
+
+            // value_low_of_highest_bull := low[index_highest_bull_count_from_left]
 
 
-            // display labels for testing
-            // label lbl_array  = label.new(bar_index, 0, labelText, size = size.auto)
-            // label.set_xy(lbl_array, bar_index-i, high[i])
-            // labelText := "Array size: " + str.tostring(candle_highs.size()) + "\nbar_index: " + str.tostring(i)
-            // label.set_text(lbl_array, labelText)
+        // If current value is smaller than the max value in the array, or the current bar is a bear bar, fill the current value with the max value.
+        if array.get(candle_highs, i-offset_position) < array.max(candle_bull_bar_highs) or isBearish(i-offset_position)
+            array.set(candle_bull_bar_highs, i-offset_position, array.max(candle_bull_bar_highs))
+            // Note: index_highest_bull does not need to be set here since the index of the max value should be retained from above if statement.
 
-    var label lbl_array  = label.new(bar_index-index_highest_bull, high[index_highest_bull], str.tostring(index_highest_bull) + "::" +str.tostring(array.get(candle_lows,index_highest_bull-1)) , size = size.auto, style = label.style_label_up)
-    label.set_xy(lbl_array, bar_index-index_highest_bull, low[index_highest_bull])
-    // label.set_xloc(lbl_array, xloc.bar_index-index_highest_bull)
-    label.set_yloc(lbl_array, yloc.belowbar)
+        // display labels for testing
+        label lbl_array  = label.new(bar_index, 0, labelText, size = size.normal, style = label.style_label_up)
+        label.set_xy(lbl_array, bar_index - i, high)
+        label.set_yloc(lbl_array, yloc = yloc.belowbar)
+        labelText := "Array: " + str.tostring(candle_highs.size()) + "\nindex: " + str.tostring(index_highest_bull) + "\nhigh:" + str.tostring(array.get(candle_bull_bar_highs,index_highest_bull)) + "\nmax:" + str.tostring(array.max(candle_bull_bar_highs))
+        label.set_text(lbl_array, labelText)
 
-
-// // Find the highest bullish bar from the array
-// maxhighestBullishBar = array.max(candle_highs)
-// // Plot the highest bullish bar
-// plot(maxhighestBullishBar, "Highest Bullish Bar", color=color.green)
-    
+        // // labels for subsequent closes below the low of the highest bull bar
+        // if close[i] < value_low_of_highest_bull and index_highest_bull_count_from_left > i
+        //     label.new(bar_index-i+1, high[i], yloc = yloc.abovebar)
 
 
+    // // display labels for testing
+    // label lbl_array  = label.new(bar_index, 0, labelText, size = size.normal, style = label.style_label_up)
+    // label.set_xy(lbl_array, bar_index, high)
+    // label.set_yloc(lbl_array, yloc = yloc.belowbar)
+    // labelText := "Array: " + str.tostring(candle_highs.size()) + "\nindex: " + str.tostring(index_highest_bull) + "\nhigh:" + str.tostring(array.get(candle_bull_bar_highs,index_highest_bull)) + "\nmax:" + str.tostring(array.max(candle_bull_bar_highs))
+    // label.set_text(lbl_array, labelText)
 
-
+    // // labels for the low of the highest bull bar
+    // if isBullish(index_highest_bull_count_from_left) 
+    //     label lbl_array = label.new(bar_index-index_highest_bull_count_from_left, high[index_highest_bull_count_from_left], str.tostring(index_highest_bull_count_from_left) + "\n" +str.tostring(array.get(candle_lows,index_highest_bull_count_from_left-1)) , size = size.auto, style = label.style_label_up)
+    //     label.set_xy(lbl_array, bar_index-index_highest_bull_count_from_left, low[index_highest_bull_count_from_left])
+    //     label.set_yloc(lbl_array, yloc.belowbar)
 
 
 //----------------------------------------------------------------------------
-// // Method for Ploting Highest High Set By Bullish Bars
-
-// // Initialize the variable to store the highest bullish bar high
-// var float highestBullishBarHigh = na
-// var float highestBullishBar = na
-
-// // Update the highest bullish bar high if the current bar is bullish
-// // if isBullish(0)
-// highestBullishBar := ta.highestbars(high, lookbackInput)
-// highestBullishBarHigh :=  ta.highest(high, lookbackInput)
+// Method for Ploting the low of the highest bullish bar from the array
+high_of_highest_bullish_bar = array.max(candle_bull_bar_highs)
+int index_low_of_highest_bull = array.indexof(candle_bull_bar_highs,high_of_highest_bullish_bar)
+low_of_highest_bullish_bar = array.max(candle_bull_bar_lows)
+// Plot the highest bullish bar
+// plot(display_low_of_highest_bull_bar?low_of_highest_bullish_bar[index_highest_bull]:na, "The Low of The Highest Bullish Bar", color=color.green)
     
-// // Plot the highest bullish bar
-// plot(highestBullishBarHigh, "Highest Bullish Bar", color=color.blue)
-// // plotarrow(highestBullishBar)
-
-// // End of Method
+// End of Method
+//----------------------------------------------------------------------------
+// // testing labels
+// label1 = label.new(bar_index, low, text=":"+str.tostring(value_low_of_highest_bull), style=label.style_none, textcolor = color.yellow)
+// label.set_xloc(label1, time, xloc.bar_time)
+// label.set_yloc(label1, yloc = yloc.belowbar)
+// label.set_color(label1, color.yellow)
+// label.set_size(label1, size.normal)
 
 
 
