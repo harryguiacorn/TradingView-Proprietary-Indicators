@@ -28,6 +28,78 @@ float[] bullishBarsLows = array.new_float(na)
 float[] array_bar_highs = array.new_float(na)
 float[] array_bar_lows = array.new_float(na)
 
+// Method 3
+
+float lowOfHighestBullishBar = na
+int index_low_of_highest_bull_counted_from_right = na
+int index_low_of_highest_bull_counted_from_left = na
+
+if array.size(array_bar_highs) > lookbackInput
+    array.shift(array_bar_highs)
+    array.shift(array_bar_lows)
+
+for index = lookbackInput - 1 to 0 by 1
+    array.push(array_bar_highs, high[index])
+    array.push(array_bar_lows, low[index])
+    
+    if isBullish(index)
+        array.push(bullishBarsHighs, high[index])
+        array.push(bullishBarsLows, low[index])
+    else
+        array.push(bullishBarsHighs, na)
+        array.push(bullishBarsLows, na)
+
+    index_low_of_highest_bull_counted_from_left := array.indexof(array_bar_highs,array.max(bullishBarsHighs))
+    index_low_of_highest_bull_counted_from_right := lookbackInput - index_low_of_highest_bull_counted_from_left - 1
+
+    // log.info("index " + str.tostring(index))
+    // log.info("array_bar_highs "+str.tostring(array_bar_highs))
+    // log.info("bullishBarsHighs " + str.tostring(bullishBarsHighs))
+    // log.info("array.max(bullishBarsHighs) " + str.tostring(array.max(bullishBarsHighs)))
+    // log.info("index_low_of_highest_bull_counted_from_left " + str.tostring(index_low_of_highest_bull_counted_from_left))
+    // log.info("index_low_of_highest_bull_counted_from_right " + str.tostring(index_low_of_highest_bull_counted_from_right))
+
+// // testing
+//     if bar_index == 31
+//         label.new(bar_index - index, na, str.tostring(bar_index) + "\n• "+str.tostring(index) + "\n• " + str.tostring(bar_index - index) + "\n" + str.tostring(index_low_of_highest_bull) +"\n🠇", yloc = yloc.abovebar, style = label.style_none, textcolor = color.yellow, size = size.normal)
+// if bar_index == 31
+//     label.new(bar_index, na, str.tostring(bar_index) + "\n•" + str.tostring(array.max(bullishBarsHighs)) +"\n" + str.tostring(array.get(bullishBarsHighs,index_low_of_highest_bull_counted_from_left)), yloc = yloc.belowbar, style = label.style_none, textcolor = color.yellow, size = size.normal)
+// // End of testing
+// if bar_index - lookbackInput < 4700 //To prevent Study References Too Many Bars In the History Error
+
+var bool low_mode_activated = false
+ 
+if bar_index >= lookbackInput
+    // Find the index of the highest bullish bar
+    indexHighestBullishBar = array.indexof(array_bar_highs, array.max(bullishBarsHighs))
+
+    // Retrieve the low of the highest bullish bar
+    lowOfHighestBullishBar := array.get(bullishBarsLows, index_low_of_highest_bull_counted_from_left)
+
+    // label.new(bar_index, na, str.tostring(bar_index) + "\n•= " + str.tostring(array.max(bullishBarsHighs), format.mintick) + "\n"+str.tostring(bar_index) + "\n🠇", yloc = yloc.belowbar, style = label.style_none, textcolor = color.yellow, size = size.normal)
+    
+    log.info("bar_index close " + str.tostring(bar_index) + " "+str.tostring(close))
+    log.info("index_low_of_highest_bull_counted_from_right " + str.tostring(index_low_of_highest_bull_counted_from_right))
+    log.info("lowOfHighestBullishBar " + str.tostring(lowOfHighestBullishBar))
+
+    if close < lowOfHighestBullishBar and not low_mode_activated
+        low_mode_activated := true
+        label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar)
+    
+    if close > lowOfHighestBullishBar
+        low_mode_activated := false
+        
+// Plot the low of the highest bullish bar
+plot(lowOfHighestBullishBar, "Low of Highest Bullish Bar", color=color.yellow)
+
+
+
+// Debugging: Uncomment the line below to see the array contents on the chart
+// plotchar(array.get(bullishBarsLows, 0), "Last Bullish Bar Low", location=location.bottom)
+
+
+// End of Method 3
+
 
 // if barstate.islast
 //     //@variable A string containing the size of `a` and the current `bar_index` value.
@@ -125,68 +197,4 @@ float[] array_bar_lows = array.new_float(na)
 // // label.set_size(label1, size.normal)
 
 
-
-// Method 3
-
-float lowOfHighestBullishBar = na
-int index_low_of_highest_bull_counted_from_right = na
-int index_low_of_highest_bull_counted_from_left = na
-
-if array.size(array_bar_highs) > lookbackInput
-    array.shift(array_bar_highs)
-    array.shift(array_bar_lows)
-
-for index = lookbackInput - 1 to 0 by 1
-    array.push(array_bar_highs, high[index])
-    array.push(array_bar_lows, low[index])
-    
-    if isBullish(index)
-        array.push(bullishBarsHighs, high[index])
-        array.push(bullishBarsLows, low[index])
-    else
-        array.push(bullishBarsHighs, na)
-        array.push(bullishBarsLows, na)
-
-    index_low_of_highest_bull_counted_from_left := array.indexof(array_bar_highs,array.max(bullishBarsHighs))
-    index_low_of_highest_bull_counted_from_right := lookbackInput - index_low_of_highest_bull_counted_from_left - 1
-
-    // log.info("index " + str.tostring(index))
-    // log.info("array_bar_highs "+str.tostring(array_bar_highs))
-    // log.info("bullishBarsHighs " + str.tostring(bullishBarsHighs))
-    // log.info("array.max(bullishBarsHighs) " + str.tostring(array.max(bullishBarsHighs)))
-    // log.info("index_low_of_highest_bull_counted_from_left " + str.tostring(index_low_of_highest_bull_counted_from_left))
-    // log.info("index_low_of_highest_bull_counted_from_right " + str.tostring(index_low_of_highest_bull_counted_from_right))
-
-// // testing
-//     if bar_index == 31
-//         label.new(bar_index - index, na, str.tostring(bar_index) + "\n• "+str.tostring(index) + "\n• " + str.tostring(bar_index - index) + "\n" + str.tostring(index_low_of_highest_bull) +"\n🠇", yloc = yloc.abovebar, style = label.style_none, textcolor = color.yellow, size = size.normal)
-// if bar_index == 31
-//     label.new(bar_index, na, str.tostring(bar_index) + "\n•" + str.tostring(array.max(bullishBarsHighs)) +"\n" + str.tostring(array.get(bullishBarsHighs,index_low_of_highest_bull_counted_from_left)), yloc = yloc.belowbar, style = label.style_none, textcolor = color.yellow, size = size.normal)
-// // End of testing
-// if bar_index - lookbackInput < 4700 //To prevent Study References Too Many Bars In the History Error
-if bar_index >= lookbackInput
-    // Find the index of the highest bullish bar
-    indexHighestBullishBar = array.indexof(array_bar_highs, array.max(bullishBarsHighs))
-
-    // Retrieve the low of the highest bullish bar
-    lowOfHighestBullishBar := array.get(bullishBarsLows, index_low_of_highest_bull_counted_from_left)
-
-    // label.new(bar_index, na, str.tostring(bar_index) + "\n•= " + str.tostring(array.max(bullishBarsHighs), format.mintick) + "\n"+str.tostring(bar_index) + "\n🠇", yloc = yloc.belowbar, style = label.style_none, textcolor = color.yellow, size = size.normal)
-    
-    log.info("bar_index close " + str.tostring(bar_index) + " "+str.tostring(close))
-    log.info("index_low_of_highest_bull_counted_from_right " + str.tostring(index_low_of_highest_bull_counted_from_right))
-    log.info("lowOfHighestBullishBar " + str.tostring(lowOfHighestBullishBar))
-
-    // if close < lowOfHighestBullishBar
-    //     label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar)
-// Plot the low of the highest bullish bar
-plot(lowOfHighestBullishBar, "Low of Highest Bullish Bar", color=color.yellow)
-
-
-
-// Debugging: Uncomment the line below to see the array contents on the chart
-// plotchar(array.get(bullishBarsLows, 0), "Last Bullish Bar Low", location=location.bottom)
-
-
-// End of Method 3
 
