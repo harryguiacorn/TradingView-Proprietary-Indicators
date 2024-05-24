@@ -52,6 +52,8 @@ for index = lookbackInput - 1 to 0 by 1
     array.push(array_bar_lows, low[index])
     
     // ------------ find bearish scenario ------------
+
+    // put only bullish bars in the array, use na for bearish ones
     if isBullish(index)
         array.push(bullishBarsHighs, high[index])
         array.push(bullishBarsLows, low[index])
@@ -80,6 +82,9 @@ for index = lookbackInput - 1 to 0 by 1
 
  
     // ------------ find bullish scenario ------------
+
+
+    // put only bearish bars in the array, use na for bullish ones
     if isBearish(index)
         array.push(bearishBarsHighs, high[index])
         array.push(bearishBarsLows, low[index])
@@ -95,12 +100,11 @@ for index = lookbackInput - 1 to 0 by 1
         index_high_of_lowest_bear_counted_from_left := 0
         // log.error("setting index " + str.tostring(index) + " array.max(bullishBarsHighs) "+ str.tostring(bullishBarsHighs)+ " index_low_of_highest_bull_counted_from_left to " + str.tostring(index_low_of_highest_bull_counted_from_left))
 
-
 if bar_index >= lookbackInput
-
     // log.info("index from left:" + str.tostring(index_low_of_highest_bull_counted_from_left) + " bullishBarsLows "+ str.tostring(bullishBarsLows))
     
     // ------------ find bearish scenario ------------
+
     // Retrieve the low of the highest bullish bar
     lowOfHighestBullishBar := array.get(bullishBarsLows, index_low_of_highest_bull_counted_from_left)
 
@@ -109,6 +113,7 @@ if bar_index >= lookbackInput
     // log.info("index_low_of_highest_bull_counted_from_right " + str.tostring(index_low_of_highest_bull_counted_from_right))
     // log.info("lowOfHighestBullishBar " + str.tostring(lowOfHighestBullishBar))
 
+    // Plot a down arrow once a bar closes below the low of the highest bullish bar, the subsequent signals will be ignored until one bar closes above its current threshold.
     if close < lowOfHighestBullishBar and not low_of_highest_bull_mode_activated
         low_of_highest_bull_mode_activated := true
         label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar, color = color.blue)
@@ -121,6 +126,7 @@ if bar_index >= lookbackInput
     // Retrieve the high of the lowest bearish bar
     highOfLowestBearishhBar := array.get(bearishBarsHighs, index_high_of_lowest_bear_counted_from_left)
 
+    // Plot an up arrow once a bar closes above the high of the lowest bearish bar, the subsequent signals will be ignored until one bar closes below its current threshold.
     if close > highOfLowestBearishhBar and not high_of_lowest_bear_mode_activated
         high_of_lowest_bear_mode_activated := true
         label.new(bar_index, low[index_high_of_lowest_bear_counted_from_left], yloc = yloc.belowbar, style = label.style_label_up, color = color.green)
