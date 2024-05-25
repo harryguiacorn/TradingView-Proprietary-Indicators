@@ -116,7 +116,7 @@ if bar_index >= lookbackInput
     // Plot a down arrow once a bar closes below the low of the highest bullish bar, the subsequent signals will be ignored until one bar closes above its current threshold.
     if close < lowOfHighestBullishBar and not low_of_highest_bull_mode_activated
         low_of_highest_bull_mode_activated := true
-        label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar, color = color.blue)
+        label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar, color = color.blue, size = size.tiny)
     
     if close > lowOfHighestBullishBar
         low_of_highest_bull_mode_activated := false
@@ -129,7 +129,7 @@ if bar_index >= lookbackInput
     // Plot an up arrow once a bar closes above the high of the lowest bearish bar, the subsequent signals will be ignored until one bar closes below its current threshold.
     if close > highOfLowestBearishhBar and not high_of_lowest_bear_mode_activated
         high_of_lowest_bear_mode_activated := true
-        label.new(bar_index, low[index_high_of_lowest_bear_counted_from_left], yloc = yloc.belowbar, style = label.style_label_up, color = color.green)
+        label.new(bar_index, low[index_high_of_lowest_bear_counted_from_left], yloc = yloc.belowbar, style = label.style_label_up, color = color.green, size = size.tiny)
     
     if close < highOfLowestBearishhBar
         high_of_lowest_bear_mode_activated := false
