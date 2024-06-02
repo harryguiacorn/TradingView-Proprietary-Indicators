@@ -25,3 +25,10 @@ plot(macdv, title = "Histogram", style = plot.style_columns, color = (macdv >= 0
 hline(0, title = "0.0")
 hline(overbought, title = "Overbought")
 hline(oversold, title = "Oversold")
+
+
+
+// Highlight chart background between specific hours
+display_hours_highlight = input(false, "Display background colours for specific hours")
+t1 = time(timeframe.period, "1000-1300,1600-2000,2400-0700:23456", "Europe/London")
+bgcolor(not na(t1) ? color.new(color.silver, 90) : na, display = display_hours_highlight? display.all: display.none)
