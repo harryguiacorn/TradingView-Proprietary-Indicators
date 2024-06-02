@@ -135,10 +135,10 @@ if bar_index >= lookbackInput
         high_of_lowest_bear_mode_activated := false
         
 // Plot the low of the highest bullish bar
-plot(display_low_of_highest_bull_bar?lowOfHighestBullishBar:na, "Low of Highest Bullish Bar", color=color.blue)
+plot(display_low_of_highest_bull_bar?lowOfHighestBullishBar:na, "Low of Highest Bullish Bar", color=color.red, style = plot.style_stepline)
 
 // Plot the high of the lowest bearish bar
-plot(display_high_of_lowest_bear_bar?highOfLowestBearishhBar:na, "High of Lowest Bearish Bar", color=color.green)
+plot(display_high_of_lowest_bear_bar?highOfLowestBearishhBar:na, "High of Lowest Bearish Bar", color=color.green, style = plot.style_stepline)
 
 // End of Method 3
 
