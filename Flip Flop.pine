@@ -43,6 +43,9 @@ int index_low_of_highest_bull_counted_from_right = na
 int index_high_of_lowest_bear_counted_from_left = na
 int index_low_of_lowest_bear_counted_from_right = na
 
+bool draw_bullish_signal = false
+bool draw_bearish_signal = false
+
 if array.size(array_bar_highs) > lookbackInput
     array.shift(array_bar_highs)
     array.shift(array_bar_lows)
@@ -80,9 +83,7 @@ for index = lookbackInput - 1 to 0 by 1
     // log.info("index_low_of_highest_bull_counted_from_left " + str.tostring(index_low_of_highest_bull_counted_from_left))
     // log.info("index_low_of_highest_bull_counted_from_right " + str.tostring(index_low_of_highest_bull_counted_from_right))
 
- 
     // ------------ find bullish scenario ------------
-
 
     // put only bearish bars in the array, use na for bullish ones
     if isBearish(index)
@@ -116,12 +117,12 @@ if bar_index >= lookbackInput
     // Plot a down arrow once a bar closes below the low of the highest bullish bar, the subsequent signals will be ignored until one bar closes above its current threshold.
     if close < lowOfHighestBullishBar and not low_of_highest_bull_mode_activated
         low_of_highest_bull_mode_activated := true
-        label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar, color = color.blue, size = size.tiny)
+        // label.new(bar_index, high[index_low_of_highest_bull_counted_from_right], yloc = yloc.abovebar, color = color.blue, size = size.tiny)
+        draw_bearish_signal := true
     
     if close > lowOfHighestBullishBar
         low_of_highest_bull_mode_activated := false
     
-
     // ------------ find bullish scenario ------------
     // Retrieve the high of the lowest bearish bar
     highOfLowestBearishhBar := array.get(bearishBarsHighs, index_high_of_lowest_bear_counted_from_left)
@@ -129,7 +130,8 @@ if bar_index >= lookbackInput
     // Plot an up arrow once a bar closes above the high of the lowest bearish bar, the subsequent signals will be ignored until one bar closes below its current threshold.
     if close > highOfLowestBearishhBar and not high_of_lowest_bear_mode_activated
         high_of_lowest_bear_mode_activated := true
-        label.new(bar_index, low[index_high_of_lowest_bear_counted_from_left], yloc = yloc.belowbar, style = label.style_label_up, color = color.green, size = size.tiny)
+        // label.new(bar_index, low[index_high_of_lowest_bear_counted_from_left], yloc = yloc.belowbar, style = label.style_label_up, color = color.green, size = size.tiny)
+        draw_bullish_signal := true
     
     if close < highOfLowestBearishhBar
         high_of_lowest_bear_mode_activated := false
@@ -140,10 +142,18 @@ plot(display_low_of_highest_bull_bar?lowOfHighestBullishBar:na, "Low of Highest 
 // Plot the high of the lowest bearish bar
 plot(display_high_of_lowest_bear_bar?highOfLowestBearishhBar:na, "High of Lowest Bearish Bar", color=color.green, style = plot.style_stepline)
 
+// Buy and Sell signals
+sellSignal = ta.crossunder(close, highOfLowestBearishhBar) 
+buySignal = ta.crossover(close, lowOfHighestBullishBar)
+
+// Plotting Buy and Sell signals
+plotshape(series=draw_bullish_signal, location=location.belowbar, color=color.green, style=shape.triangleup, text="FF", title="FF Buy Signal")
+plotshape(series=draw_bearish_signal, location=location.abovebar, color=color.red, style=shape.triangledown, text="FF", title="FF Sell Signal")
+
 // End of Method 3
 
 // Highlight chart background between specific hours
-display_hours_highlight = input(true, "Display background colours for specific hours")
+display_hours_highlight = input(false, "Display background colours for specific hours")
 display_bgcolor = (timeframe.isintraday and display_hours_highlight)
 
 t_highlight = time(timeframe.period, "1000-1300,1600-2000,2400-0700:23456", "Europe/London")
