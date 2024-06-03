@@ -145,6 +145,9 @@ plot(display_high_of_lowest_bear_bar?highOfLowestBearishhBar:na, "High of Lowest
 
 // Highlight chart background between specific hours
 display_hours_highlight = input(true, "Display background colours for specific hours")
-t1 = time(timeframe.period, "1000-1300,1600-2000,2400-0700:23456", "Europe/London")
-bgcolor(not na(t1) ? color.new(color.silver, 90) : na, display = display_hours_highlight? display.all: display.none)
 
+display_hours_highlight_intraday = timeframe.isintraday
+display_bgcolor = (display_hours_highlight_intraday and display_hours_highlight)
+
+t1 = time(timeframe.period, "1000-1300,1600-2000,2400-0700:23456", "Europe/London")
+bgcolor((not na(t1) and display_bgcolor) ? color.new(color.silver, 90) : na)
