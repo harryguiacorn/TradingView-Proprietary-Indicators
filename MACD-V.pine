@@ -26,7 +26,8 @@ hline(0, title = "0.0")
 hline(overbought, title = "Overbought")
 hline(oversold, title = "Oversold")
 
-
+plotshape(macdv < oversold ? macdv * 1.1 : na, "MACD-V Oversold", shape.circle, location = location.absolute, color = color.new(color.fuchsia, 0))
+plotshape(macdv > overbought ? macdv * 1.1 : na, "MACD-V Overbought", shape.circle, location = location.absolute, color = color.new(color.fuchsia, 0))
 
 // Highlight chart background between specific hours
 display_hours_highlight = input(false, "Display background colours for specific hours")
