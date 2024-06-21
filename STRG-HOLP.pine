@@ -1,0 +1,62 @@
+//@version=5
+_maxPyramiding = 5
+strategy('STRG-HOLP', overlay=true, pyramiding=_maxPyramiding, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+_year = input.int(2020, minval=1, title='Look back since(yr)')
+_intLookback = input.int(title='Lookback Periods', defval=10, minval=2)
+//_contract = input(1, minval=1, title="Contract size")
+_bLongAllowed = input(title='Long allowed', defval=true)
+_bShortAllowed = input(title='Short allowed', defval=true)
+
+_arrowHOLP = 0.0
+_arrowLOHP = 0.0
+//_atrNumStop = 1
+_atrNumProfit = 5
+_atr = ta.atr(14)
+_rewardToRisk = input.float(title='R/R', defval=3.0, minval=1)
+longCondition = 0
+shortCondition = 0
+__stopLoss = float(na)
+__takeProfit = float(na)
+
+var _boolNewLow = 0
+var _sessionLow = 0.0
+lastLoBar = -ta.lowestbars(low, _intLookback)
+if low[0] < ta.lowest(_intLookback)[1]
+    _sessionLow := low[0]
+    _boolNewLow := 1
+    _boolNewLow
+if close[0] > high[lastLoBar]
+    if _boolNewLow == 1
+        _arrowHOLP := close[0]
+        _boolNewLow := 0
+        longCondition := 1
+        longCondition
+if longCondition and year >= _year and _bLongAllowed
+    __stopLoss := _sessionLow
+    __takeProfit := close + (close - __stopLoss) * _rewardToRisk  //close + _atr * _atrNumProfit
+    strategy.entry('L', strategy.long)  //, _contract
+    strategy.exit('Exit L', 'L', stop=__stopLoss, limit=__takeProfit)  //
+    longCondition := 0
+    longCondition
+
+var _boolNewHigh = 0
+var _sessionHigh = 0.0
+lastHiBar = -ta.highestbars(high, _intLookback)
+if high[0] > ta.highest(_intLookback)[1]
+    _sessionHigh := high[0]
+    _boolNewHigh := 1
+    _boolNewHigh
+if close[0] < low[lastHiBar]
+    if _boolNewHigh == 1
+        _arrowLOHP := close[0]
+        _boolNewHigh := 0
+        shortCondition := 1
+        shortCondition
+if shortCondition and year >= _year and _bShortAllowed
+    __stopLoss := _sessionHigh
+    __takeProfit := close - (__stopLoss - close) * _rewardToRisk  //close - _atr * _atrNumProfit
+    strategy.entry('S', strategy.short)  //, _contract
+    strategy.exit('Exit S', 'S', stop=__stopLoss, limit=__takeProfit)  //
+    shortCondition := 0
+    shortCondition
+
