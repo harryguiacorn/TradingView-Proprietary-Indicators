@@ -1,0 +1,34 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+
+//@version=5
+indicator("3 SMAs", overlay = true)
+
+ma_1 = ta.sma(close, 7)
+ma_2 = ta.sma(close, 25)
+ma_3 = ta.sma(close, 50)
+
+plot(ma_1, color = color.new(color.yellow, 0), linewidth = 2)
+plot(ma_2, color = color.new(color.purple, 0), linewidth = 2)
+plot(ma_3, color = color.new(color.blue, 0), linewidth = 2)
+
+// MA 1 crossing MA 2
+ma_1_x_2_l = ta.crossover(ma_1,ma_2) //and ma_3 > ma_2 and ma_3 > ma_1
+ma_1_x_2_s = ta.crossunder(ma_1,ma_2) //and ma_3 < ma_2 and ma_3 < ma_1
+
+plotshape(ma_1_x_2_s, style = shape.arrowdown, color = color.new(color.red, 0))
+plotshape(ma_1_x_2_l, style = shape.arrowup, color = color.new(color.green, 0), location = location.belowbar)
+
+// MA 2 crossing MA 3
+ma_2_x_3_l = ta.crossover(ma_2,ma_3)
+ma_2_x_3_s = ta.crossunder(ma_2,ma_3)
+
+plotshape(ma_2_x_3_s, style = shape.circle, color = color.new(color.purple, 0))
+plotshape(ma_2_x_3_l, style = shape.circle, color = color.new(color.purple, 0), location = location.belowbar)
+
+// MA 1 crossing MA 2 and MA 3
+ma_1_x_2_3_l = ma_1 > ma_2 and ma_1 > ma_3 and (ma_1[1] < ma_2[1] or ma_1[1] < ma_3[1])
+ma_1_x_2_3_s = ma_1 < ma_2 and ma_1 < ma_3 and (ma_1[1] > ma_2[1] or ma_1[1] > ma_3[1])
+
+plotshape(ma_1_x_2_3_s, style = shape.triangledown, color = color.new(color.yellow, 0))
+plotshape(ma_1_x_2_3_l, style = shape.triangleup, color = color.new(color.yellow, 0), location = location.belowbar)
