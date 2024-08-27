@@ -1,0 +1,59 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © FxCloudTrader
+
+//@version=5
+strategy("STRG One Bar Pursuit", overlay=true, margin_long=100, margin_short=100)
+
+
+// Input for ATR length and multiplier for entry and stop
+atrLength = input.int(14, title="ATR Length")
+atrMultiplierEntry = input.float(1, title="ATR Multiplier for Entry")
+atrMultiplierStop = input.float(1, title="ATR Multiplier for Stop")
+
+// Calculate ATR
+atr = ta.atr(atrLength)
+
+plot(atr)
+
+// Define the bullish and bearish conditions
+bullishBar = close > open  and year >= 2024
+bearishBar = close < open and year >= 2024
+
+// Check for long entry condition
+longCondition = bearishBar[1] and bullishBar
+
+// Define long entry price (limit order) and stop loss
+longProfitPrice = close[1] + atrMultiplierEntry * atr[1]
+longStopPrice = longProfitPrice - atrMultiplierStop * atr[1]
+
+// Check for short entry condition
+shortCondition = bullishBar[1] and bearishBar
+
+// Define short entry price (limit order) and stop loss
+shortProfitPrice = close[1] - atrMultiplierEntry * atr[1]
+shortStopPrice = shortProfitPrice + atrMultiplierStop * atr[1]
+
+var trade_direction = 0
+
+// Execute long trade
+if longCondition
+    strategy.entry("Long", strategy.long, qty = 2)
+    strategy.exit("Long Exit", "Long", stop=longStopPrice) //, limit = longProfitPrice, qty = 1
+    log.info("longProfitPrice {0}", longProfitPrice)
+    trade_direction := 1
+
+// Execute short trade
+if shortCondition
+    strategy.entry("Short", strategy.short, qty = 2)
+    strategy.exit("Short Exit", "Short", stop=shortStopPrice) //, limit = shortProfitPrice, qty = 1
+    trade_direction := -1
+
+if bearishBar and trade_direction == 1
+    // strategy.exit("Long Exit", "Long")
+    strategy.close_all("Long Exit")
+    trade_direction := 0
+
+if bullishBar and trade_direction == -1
+    // strategy.exit("Short Exit", "Short")
+    strategy.close_all("Short Exit")
+    trade_direction := 0
