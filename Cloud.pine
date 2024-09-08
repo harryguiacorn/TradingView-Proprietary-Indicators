@@ -63,10 +63,10 @@ leadLine1 = getSenkou_spanA(syminfo.tickerid, timeframe.period, conversionLine, 
 leadLine2 = getSenkou_spanB(syminfo.tickerid, timeframe.period, senkou2Periods) //getMidPoint(senkou2Periods, 0)
 plot(display_ichimoku?conversionLine:na, color=color.new(color.fuchsia, 50), linewidth=4, title='Tenkan-Sen (Conversion Line)', style = plot.style_stepline)
 plot(display_ichimoku?baseLine:na, color=color.new(color.blue, 20), linewidth=4, title='Kijun-Sen (Base Line)', style = plot.style_stepline)
-plot(display_ichimoku?close:na, offset=-_displacement, color=color.new(color.white, 50), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=2, display = display_chikou_span? display.all: display.none)
+plot(display_ichimoku?close:na, offset=-_displacement, color=color.new(color.white, 30), title='Chikou Span (Lagging Line)', style=plot.style_circles, linewidth=2, display = display_chikou_span? display.all: display.none)
 p1 = plot(display_ichimoku?leadLine1:na, offset=_displacement, color=color.new(color.green, 50), title='Senkou Span (Lead 1)')
 p2 = plot(display_ichimoku?leadLine2:na, offset=_displacement, color=color.new(color.red, 50), title='Senkou Span (Lead 2)')
-fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 95) : color.new(color.red, 95))
+fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 80) : color.new(color.red, 80))
 
 //END OF OFFICIAL ICHIMOKU PINE SCRIPT
 
@@ -344,5 +344,5 @@ start = input(0.02)
 increment = input(0.02)
 maximum = input(0.2, "Max Value")
 out = ta.sar(start, increment, maximum)
-plot(out, "ParabolicSAR", style=plot.style_cross, color=color.white, linewidth = 2)
+plot(out, "ParabolicSAR", style=plot.style_cross, color=color.new(color.yellow, 30), linewidth = 2)
 // -------------------------------- Parabolic SAR --------------------------------
