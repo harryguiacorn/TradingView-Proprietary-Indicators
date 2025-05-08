@@ -3,9 +3,10 @@
 
 //@version=5
 indicator(title="Flip Flop", shorttitle="Flip Flop", overlay=true, precision =4)
-lookbackInput = input.int(20, "Lookback in bars", minval = 1, maxval = 4999)
-display_low_of_highest_bull_bar = input(true,"display_low_of_highest_bull_bar")
-display_high_of_lowest_bear_bar = input(true,"display_high_of_lowest_bear_bar")
+var group_bars = "Flip Flop"
+lookbackInput = input.int(20, "Lookback in bars", minval = 1, maxval = 4999, group =  group_bars)
+display_low_of_highest_bull_bar = input(true,"display_low_of_highest_bull_bar", group =  group_bars)
+display_high_of_lowest_bear_bar = input(true,"display_high_of_lowest_bear_bar", group =  group_bars)
 
 isBullish(i) =>
     close[i] > open[i]
@@ -158,3 +159,12 @@ display_bgcolor = (timeframe.isintraday and display_hours_highlight)
 
 t_highlight = time(timeframe.period, "1000-1300,1600-2000,2400-0700:23456", "Europe/London")
 bgcolor((not na(t_highlight) and display_bgcolor) ? color.new(color.silver, 90) : na, title = "Highlight Quiet Hours")
+
+// Bollinger Bands
+var group_bb = "Bollinger Bands"
+display_bb = input.bool(true, "Display Bollinger Bands", "BB", group = group_bb)
+[bb_middle, bb_upper, bb_lower] = ta.bb(close, 20, 2)
+plot(display_bb? bb_lower : na, "BB Lower", color = color.new(color.blue, 0), linewidth = 1, style = plot.style_stepline)
+plot(display_bb? bb_upper : na, "BB Upper", color = color.new(color.blue, 0), linewidth = 1, style = plot.style_stepline)
+plot(display_bb? bb_middle : na, "BB Middle", color = color.new(color.blue, 0), linewidth = 1, style = plot.style_stepline, display = display.none)
+
